@@ -39,7 +39,8 @@ void print_graph(vector<vector<Edge>> adj){
 void dijkstra(int nNodes = 100){
 	vector<vector<Edge>> adjacency(nNodes);
 
-	std::srand(std::time(NULL));
+	// std::srand(std::time(NULL));
+	std::srand(72);
 
 	// Generate edges
 	for(int i = 0; i < 2*nNodes; i++){
