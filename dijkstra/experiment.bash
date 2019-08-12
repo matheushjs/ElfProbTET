@@ -6,7 +6,7 @@ function mtime {
 ./prog;
 ./prog;
 
-for psize in 500000 1000000 2000000; do
+for psize in 500000 1000000 2000000 10000000; do
 	for i in $(seq 1000); do
 		mtime ./prog $psize;
 	done;
