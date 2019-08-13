@@ -1,19 +1,21 @@
 
 kwcwg.pdf = function(x, alpha, beta, gamma, a, b){
-	if(   x < 0
-	   || alpha < 0 || alpha > 1
-	   || beta < 0
-	   || gamma < 0
-	   || a < 0
-	   || b < 0
+	#cat("Called with", "(", x, ")", alpha, beta, gamma, a, b, "\n")
+
+	if(  sum(x < 0) > 0
+	  || alpha < 0 || alpha > 1
+	  || beta < 0
+	  || gamma < 0
+	  || a < 0
+	  || b < 0
 	){
-		cat("Must respect:
-		x > 0
-		0 < alpha < 1
-		beta > 0
-		gamma > 0
-		a > 0
-		b > 0");
+#		cat("Must respect:
+#		x > 0
+#		0 < alpha < 1
+#		beta > 0
+#		gamma > 0
+#		a > 0
+#		b > 0\n");
 		return(0);
 	}
 
@@ -49,5 +51,46 @@ kwcwg.pdf = function(x, alpha, beta, gamma, a, b){
 	logC = (a+1)*log(C)
 	logDE = (b-1)*log(1 - D/(E + 1e-10))
 
-	return(exp(logA + logB - logC + logDE))
+	result = exp(logA + logB - logC + logDE)
+	#print(result)
+
+	return(result)
 }
+
+# Get the parameters of the kwcwg after fitting the dataset
+kwcwg.infer = function(dataset){
+
+	# The likelihood function
+	likelihood = function(params){
+		return(-sum(log(
+			kwcwg.pdf(dataset, params[1], params[2], params[3], params[4], params[5]) + 1e-100
+		)))
+	}
+
+	retval = NULL
+
+	# We use a grid of initial values, and take the best of them
+	for(alpha in c(0.1, 0.2, 0.4, 0.6, 0.8, 0.9)){
+	for(beta in c(0.1, 2, 6, 10)){
+	for(gamma in c(0.1, 2, 6, 10)){
+	for(a in c(0.1, 2, 6, 10)){
+	for(b in c(0.1, 2, 6, 10)){
+		params = c(alpha, beta, gamma, a, b)
+		# print(params)
+		
+		cat("Optimizing with initial params:", params, "\n")
+		result = optim(params, likelihood)
+		params = result$par
+		val = result$value
+		cat("Got params:", params, "\n")
+
+		retval = rbind(retval, c(params, val))
+	} } } } }
+
+	retval = as.data.frame(retval)
+	colnames(retval) = c("alpha", "beta", "gamma", "a", "b", "value")
+	print(retval)
+	return(retval)
+}
+
+
