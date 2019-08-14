@@ -8,6 +8,14 @@ files = c(
 	"../dijkstra/output_500K1M2M10M.txt"
 )
 
+# Returns the sample sets in each file
+# Each file has 1000 samples for each experiment made, so each sample set has 1000 entries
+get_sample_sets = function(file){
+	data = read.csv(file, header=F)
+	data = matrix(t(data), nrow=1000)
+	return(data)
+}
+
 # Plots a "histogram" of the dataset, and the inferred PDF function
 plotme = function(dataset, params){
 	# Plot the resulting pdf
@@ -18,14 +26,6 @@ plotme = function(dataset, params){
 	
 	lines(x, y, "l")
 	scan()
-}
-
-# Returns the sample sets in each file
-# Each file has 1000 samples for each experiment made, so each sample set has 1000 entries
-get_sample_sets = function(file){
-	data = read.csv(file, header=F)
-	data = matrix(t(data), nrow=1000)
-	return(data)
 }
 
 # Process all files and save all plots
@@ -59,4 +59,31 @@ main = function(){
 	}
 }
 
-main()
+# main()
+
+
+# Already prepares all sample sets, with all information we might need
+# Make them available in the prompt, for the user
+fullDataset = list()
+counter = 1
+for(file in files){
+	samples = get_sample_sets(file)
+	for(i in 1:ncol(samples)){
+		dataset = list()
+		dataset$samples = samples[,i]
+		dataset$srcFile = file
+		dataset$destFile = paste(strsplit(dataset$srcFile, "/")[[1]][2], "-", round(mean(dataset$samples), 2), ".png", sep="")
+
+		cat("File:", file, "\n")
+
+		fullDataset[[counter]] = dataset
+		counter = counter + 1
+	}
+}
+
+for(i in 1:length(fullDataset)){
+	dataset = fullDataset[[i]]
+	cat("Source:", dataset$srcFile, "\n")
+	cat("Dest png:", dataset$destFile, "\n")
+	cat("Sample count:", length(dataset$samples), "\n")
+}

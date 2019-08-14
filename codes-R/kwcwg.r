@@ -71,16 +71,16 @@ kwcwg.infer = function(dataset){
 	retval = NULL
 
 	# We use a grid of initial values, and take the best of them
-#	for(alpha in c(0.1, 0.2, 0.4, 0.6, 0.8, 0.9)){
-#	for(beta in c(0.1, 2, 6, 10)){
-#	for(gamma in c(0.1, 2, 6, 10)){
-#	for(a in c(0.1, 2, 6, 10)){
-#	for(b in c(0.1, 2, 6, 10)){
-	for(alpha in c(0.1, 0.4, 0.9)){
-	for(beta in c(6, 10)){
-	for(gamma in c(2, 10)){
-	for(a in c(2, 10)){
-	for(b in c(0.1, 10)){
+	for(alpha in c(0.1, 0.2, 0.4, 0.6, 0.8, 0.9)){
+	for(beta in c(0.1, 2, 6, 10)){
+	for(gamma in c(0.1, 2, 6, 10)){
+	for(a in c(0.1, 2, 6, 10)){
+	for(b in c(0.1, 2, 6, 10)){
+#	for(alpha in c(0.1, 0.4, 0.9)){
+#	for(beta in c(6, 10)){
+#	for(gamma in c(2, 10)){
+#	for(a in c(2, 10)){
+#	for(b in c(0.1, 10)){
 		params = c(alpha, beta, gamma, a, b)
 		# print(params)
 		
