@@ -5,18 +5,18 @@ source("./kwcwg.r")
 files = c(
 	"../sqldb_manipulation/output-100-150-300-1500.txt",
 	"../mandelbrot/output_5000_10000_30000.txt",
-	"../dijkstra/output_500K1M2M10B.txt"
+	"../dijkstra/output_500K1M2M10M.txt"
 )
 
 # Plots a "histogram" of the dataset, and the inferred PDF function
 plotme = function(dataset, params){
 	# Plot the resulting pdf
-	histData = hist(dataset, breaks=25, plot=F)
-	plot(histData$mids, histData$density)
-	#plot(density(dataset))
+	histData = hist(dataset, breaks=20, prob=T, col="peachpuff")
 
-	x = seq(min(histData$mids)*0.9, max(histData$mids)*1.1, by=0.005)
-	lines(x, kwcwg.pdf(x, params[1], params[2], params[3], params[4], params[5]), "l")
+	x = seq(min(histData$mids)*0.9, max(histData$mids)*1.1, length=200)
+	y = kwcwg.pdf(x, params[1], params[2], params[3], params[4], params[5])
+	
+	lines(x, y, "l")
 	scan()
 }
 
@@ -38,16 +38,24 @@ main = function(){
 
 		# For each experiment, perform the inference and show the result
 		for(i in 1:ncol(samples)){
+			dataset = samples[,i]
+
 			cat("Processing set number #", counter, "\n", sep="")
 			counter = counter + 1
 
 			# print(samples[,i])
-			params = kwcwg.infer(samples[,i])
-			plotme(samples[,i], params[nrow(params),1:5])
+			table = kwcwg.infer(dataset)
+			print(table)
 
-			break;
+			# Get last row
+			params = table[nrow(table),]
+			
+			# Get first 5 columns
+			params = as.matrix(params[,1:5])
+			cat("params:", params, "\n")
+
+			plotme(dataset, params)
 		}
-		break;
 	}
 }
 

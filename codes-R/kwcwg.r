@@ -16,7 +16,7 @@ kwcwg.pdf = function(x, alpha, beta, gamma, a, b){
 #		gamma > 0
 #		a > 0
 #		b > 0\n");
-		return(0);
+		return(rep(0, length(x)));
 	}
 
 	# Original function
@@ -49,10 +49,11 @@ kwcwg.pdf = function(x, alpha, beta, gamma, a, b){
 	logA = log(A)
 	logB = (a-1)*log(B)
 	logC = (a+1)*log(C)
-	logDE = (b-1)*log(1 - D/(E + 1e-10))
+	logDE = (b-1)*log(1 - D/(E))
 
 	result = exp(logA + logB - logC + logDE)
-	#print(result)
+
+	result[!is.finite(result)] = 0
 
 	return(result)
 }
@@ -70,16 +71,22 @@ kwcwg.infer = function(dataset){
 	retval = NULL
 
 	# We use a grid of initial values, and take the best of them
-	for(alpha in c(0.1, 0.2, 0.4, 0.6, 0.8, 0.9)){
-	for(beta in c(0.1, 2, 6, 10)){
-	for(gamma in c(0.1, 2, 6, 10)){
-	for(a in c(0.1, 2, 6, 10)){
-	for(b in c(0.1, 2, 6, 10)){
+#	for(alpha in c(0.1, 0.2, 0.4, 0.6, 0.8, 0.9)){
+#	for(beta in c(0.1, 2, 6, 10)){
+#	for(gamma in c(0.1, 2, 6, 10)){
+#	for(a in c(0.1, 2, 6, 10)){
+#	for(b in c(0.1, 2, 6, 10)){
+	for(alpha in c(0.1, 0.4, 0.9)){
+	for(beta in c(6, 10)){
+	for(gamma in c(2, 10)){
+	for(a in c(2, 10)){
+	for(b in c(0.1, 10)){
 		params = c(alpha, beta, gamma, a, b)
 		# print(params)
 		
 		cat("Optimizing with initial params:", params, "\n")
 		result = optim(params, likelihood)
+		result = optim(result$par, likelihood)
 		params = result$par
 		val = result$value
 		cat("Got params:", params, "\n")
@@ -89,7 +96,11 @@ kwcwg.infer = function(dataset){
 
 	retval = as.data.frame(retval)
 	colnames(retval) = c("alpha", "beta", "gamma", "a", "b", "value")
-	print(retval)
+
+	# We sort it by value
+	sortedIdx = sort.list(retval$value, decreasing=TRUE)
+	retval = retval[sortedIdx,]
+
 	return(retval)
 }
 
