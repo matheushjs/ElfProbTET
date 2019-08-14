@@ -87,3 +87,15 @@ for(i in 1:length(fullDataset)){
 	cat("Dest png:", dataset$destFile, "\n")
 	cat("Sample count:", length(dataset$samples), "\n")
 }
+
+hints = function(){
+	cat("
+	dataset = fullDataset[[1]]
+	hist(dataset$samples, prob=T, xlim=c(0,3))
+	x = seq(0, 3, length=200)
+	y = kwcwg.pdf(x, 0.5, 20, 2, 1, 1)
+	lines(x, y)", "\n")
+}
+
+cat("INFO: I've lodaded the dataset in the variable 'fullDataset'", "\n")
+cat("`hints()` to get help", "\n")
