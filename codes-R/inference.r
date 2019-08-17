@@ -91,10 +91,9 @@ for(i in 1:length(fullDataset)){
 hints = function(){
 	cat("
 	dataset = fullDataset[[1]]
-	hist(dataset$samples, prob=T, xlim=c(0,3))
-	x = seq(0, 3, length=200)
-	y = kwcwg.pdf(x, 0.5, 20, 2, 1, 1)
-	lines(x, y)", "\n")
+	params = kwcwg.infer(dataset$samples);
+	params = as.matrix(params[nrow(params),])
+	kwcwg.plot(dataset$samples, params[1], params[2], params[3], params[4], params[5])", "\n")
 }
 
 cat("INFO: I've lodaded the dataset in the variable 'fullDataset'", "\n")
