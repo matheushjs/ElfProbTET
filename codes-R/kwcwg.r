@@ -121,6 +121,5 @@ kwcwg.plot = function(samples, alpha, beta, gamma, a, b){
 	hist(samples, prob=T, xlim=c(minVal, maxVal))
 	x = seq(minVal, maxVal, length=200)
 	y = kwcwg.pdf(x, alpha, beta, gamma, a, b)
-	print(y)
 	lines(x, y)
 }

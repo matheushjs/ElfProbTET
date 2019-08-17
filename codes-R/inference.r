@@ -1,5 +1,6 @@
 
 source("./kwcwg.r")
+source("./weibull.r")
 
 # Files that we will process
 files = c(
