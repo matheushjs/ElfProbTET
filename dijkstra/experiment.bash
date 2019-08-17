@@ -10,4 +10,4 @@ for psize in 500000 1000000 2000000 10000000; do
 	for i in $(seq 1000); do
 		mtime ./prog $psize;
 	done;
-done > output.txt;
+done > output_500K1M2M10M.txt;

@@ -10,4 +10,4 @@ for psize in 100 150 300 1500; do
 	for i in $(seq 1000); do
 		mtime python3 ./prog.py $psize;
 	done;
-done > output.txt;
+done > output-100-150-300-1500.txt;
