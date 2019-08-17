@@ -1,6 +1,7 @@
 
 source("./kwcwg.r")
 source("./weibull.r")
+source("./gamma.r")
 
 # Files that we will process
 files = c(
