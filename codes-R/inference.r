@@ -2,6 +2,7 @@
 source("./kwcwg.r")
 source("./weibull.r")
 source("./gamma.r")
+source("./norm.r")
 
 # Returns the sample sets in each file
 # Each file has 1000 samples for each experiment made, so each sample set has 1000 entries
