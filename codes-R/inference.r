@@ -31,7 +31,6 @@ experiment.files = function(){
 		# remove extension
 		fileRoot = strsplit(file, ".txt")[[1]]
 		fileMetadata = strsplit(fileRoot, "_")[[1]]
-		outFile = paste(fileRoot, ".png", sep="")
 
 		algor = fileMetadata[1]
 		machine = fileMetadata[2]
@@ -43,7 +42,7 @@ experiment.files = function(){
 		entry$algorithm = algor
 		entry$machine = machine
 		entry$psizes = psizes
-		entry$outputFile = outFile
+		entry$fileroot = fileRoot
 		entry$samples = samples
 
 		fullDataset[[length(fullDataset)+1]] = entry
@@ -62,32 +61,30 @@ samples.hist = function(samples, breaks=20){
 }
 
 # Process all files and save all plots
-main = function(){
-	counter = 0
+generate.plots = function(fullDataset){
+	for(i in 1:length(fullDataset)){
+		dataset = fullDataset[[i]]
 
-	# Each file has data from multiple experiments
-	for(file in files){
-		samples = get_sample_sets(file)
+		for(j in 1:length(dataset$psizes)){
+			psize = dataset$psizes[j]
+			samples = dataset$samples[,j]
 
-		# For each experiment, perform the inference and show the result
-		for(i in 1:ncol(samples)){
-			dataset = samples[,i]
+			samples.hist(samples)
 
-			cat("Processing set number #", counter, "\n", sep="")
-			counter = counter + 1
+			params = kwcwg.infer(samples)
+			params = as.matrix(params[nrow(params),])
+			kwcwg.lines(samples, params, lty=1, col=1, lwd=3)
 
-			# print(samples[,i])
-			table = kwcwg.infer(dataset)
-			print(table)
+			params = gamma.infer(samples)
+			params = as.matrix(params[nrow(params),])
+			gamma.lines(samples, params, lty=2, col=2, lwd=3)
 
-			# Get last row
-			params = table[nrow(table),]
-			
-			# Get first 5 columns
-			params = as.matrix(params[,1:5])
-			cat("params:", params, "\n")
+			params = weibull.infer(samples)
+			params = as.matrix(params[nrow(params),])
+			weibull.lines(samples, params, lty=3, col=3, lwd=3)
 
-			plotme(dataset, params)
+			outputName = paste(dataset$fileroot, "-", psize, ".png", sep="")
+			savePlot(outputName, type="png")
 		}
 	}
 }
@@ -106,7 +103,9 @@ hints = function(){
 	samples.hist(dataset$samples[,1])
 	params = kwcwg.infer(dataset$samples[,1]);
 	params = as.matrix(params[nrow(params),])
-	kwcwg.lines(dataset$samples[,1], params[1], params[2], params[3], params[4], params[5])", "\n")
+	kwcwg.lines(dataset$samples[,1], params[1], params[2], params[3], params[4], params[5])
+	
+	generate.plots(fullDataset)", "\n")
 }
 
 cat("INFO: I've lodaded the dataset in the variable 'fullDataset'", "\n")

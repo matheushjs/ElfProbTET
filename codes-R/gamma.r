@@ -14,7 +14,7 @@ gamma.infer = function(samples){
 
 	retval = NULL
 
-	for(shape in c(0.5, 2, 5, 10, 20, 30, 40)){
+	for(shape in c(0.5, 2, 5, 10, 20, 100, 200, 500, 1000, 5000, 10000, 20000)){
 		# The mean of a gamma is shape*scale
 		# So we estimate the scale as being scale = mean(samples) / shape
 		estimatedScale = mean(samples) / shape
