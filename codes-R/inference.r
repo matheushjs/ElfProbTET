@@ -87,10 +87,11 @@ generate.plots = function(fullDataset){
 			params = as.matrix(params[nrow(params),])
 			norm.lines(samples, params, lty=4, col=4, lwd=4)
 
+			legend("topright", c("KW-CWG", "Gamma", "Weibull", "Normal"),
+				   lty=1:4, col=1:4, lwd=1:4)
+
 			outputName = paste(dataset$fileroot, "-", psize, ".png", sep="")
 			savePlot(outputName, type="png")
-
-			scan()
 		}
 	}
 }
