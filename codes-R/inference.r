@@ -3,19 +3,52 @@ source("./kwcwg.r")
 source("./weibull.r")
 source("./gamma.r")
 
-# Files that we will process
-files = c(
-	"../sqldb_manipulation/output-100-150-300-1500.txt",
-	"../mandelbrot/output_5000_10000_30000.txt",
-	"../dijkstra/output_500K1M2M10M.txt"
-)
-
 # Returns the sample sets in each file
 # Each file has 1000 samples for each experiment made, so each sample set has 1000 entries
 get_sample_sets = function(file){
 	data = read.csv(file, header=F)
-	data = matrix(t(data), nrow=1000)
+	data = as.data.frame(matrix(t(data), nrow=1000))
 	return(data)
+}
+
+# Already prepares all sample sets, with all information we might need
+# Returns a data frame with all information we need
+#    - origin file name
+#    - index of first sample of this experiment
+#    - problem size of this experiment
+#    - machine in which the experiment was executed
+#    - algorithm in question
+experiment.files = function(){
+	cmd = paste("ls", "../experiments")
+	files = system(cmd, intern=T)
+
+	fullDataset = list()
+
+	for(file in files){
+		entry = list()
+
+		# remove extension
+		fileRoot = strsplit(file, ".txt")[[1]]
+		fileMetadata = strsplit(fileRoot, "_")[[1]]
+		outFile = paste(fileRoot, ".png", sep="")
+
+		algor = fileMetadata[1]
+		machine = fileMetadata[2]
+		psizes = fileMetadata[3:length(fileMetadata)]
+
+		samples = get_sample_sets(paste("../experiments/", file, sep=""))
+
+		entry$filename = file
+		entry$algorithm = algor
+		entry$machine = machine
+		entry$psizes = psizes
+		entry$outputFile = outFile
+		entry$samples = samples
+
+		fullDataset[[length(fullDataset)+1]] = entry
+	}
+
+	return (fullDataset)
 }
 
 # Plots a "histogram" of the dataset, and the inferred PDF function
@@ -63,32 +96,11 @@ main = function(){
 
 # main()
 
+fullDataset = experiment.files()
 
-# Already prepares all sample sets, with all information we might need
-# Make them available in the prompt, for the user
-fullDataset = list()
-counter = 1
-for(file in files){
-	samples = get_sample_sets(file)
-	for(i in 1:ncol(samples)){
-		dataset = list()
-		dataset$samples = samples[,i]
-		dataset$srcFile = file
-		dataset$destFile = paste(strsplit(dataset$srcFile, "/")[[1]][2], "-", round(mean(dataset$samples), 2), ".png", sep="")
-
-		cat("File:", file, "\n")
-
-		fullDataset[[counter]] = dataset
-		counter = counter + 1
-	}
-}
-
-for(i in 1:length(fullDataset)){
-	dataset = fullDataset[[i]]
-	cat("Source:", dataset$srcFile, "\n")
-	cat("Dest png:", dataset$destFile, "\n")
-	cat("Sample count:", length(dataset$samples), "\n")
-}
+cat("Variable: fullDataset\n")
+cat("# entries: ", length(fullDataset), "\n")
+cat("Each entry has:", paste(names(fullDataset[[1]])), sep="\n\t$")
 
 hints = function(){
 	cat("
