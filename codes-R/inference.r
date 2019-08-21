@@ -105,9 +105,9 @@ cat("Each entry has:", paste(names(fullDataset[[1]])), sep="\n\t$")
 hints = function(){
 	cat("
 	dataset = fullDataset[[1]]
-	params = kwcwg.infer(dataset$samples);
+	params = kwcwg.infer(dataset$samples[,1]);
 	params = as.matrix(params[nrow(params),])
-	kwcwg.plot(dataset$samples, params[1], params[2], params[3], params[4], params[5])", "\n")
+	kwcwg.plot(dataset$samples[,1], params[1], params[2], params[3], params[4], params[5])", "\n")
 }
 
 cat("INFO: I've lodaded the dataset in the variable 'fullDataset'", "\n")
