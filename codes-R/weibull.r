@@ -42,12 +42,11 @@ weibull.infer = function(samples){
 	return(retval)
 }
 
-weibull.plot = function(samples, shape, scale){
+weibull.lines = function(samples, params, ...){
 	minVal = min(samples) * 0.9;
 	maxVal = max(samples) * 1.1;
 
-	hist(samples, prob=T, xlim=c(minVal, maxVal))
 	x = seq(minVal, maxVal, length=200)
-	y = dweibull(x, shape=shape, scale=scale)
-	lines(x, y)
+	y = dweibull(x, shape=params[1], scale=params[2])
+	lines(x, y, ...)
 }

@@ -52,16 +52,13 @@ experiment.files = function(){
 	return (fullDataset)
 }
 
-# Plots a "histogram" of the dataset, and the inferred PDF function
-plotme = function(dataset, params){
-	# Plot the resulting pdf
-	histData = hist(dataset, breaks=20, prob=T, col="peachpuff")
+# Plots a "histogram" of the dataset
+samples.hist = function(samples, breaks=20){
+	minVal = min(samples) * 0.9;
+	maxVal = max(samples) * 1.1;
 
-	x = seq(min(histData$mids)*0.9, max(histData$mids)*1.1, length=200)
-	y = kwcwg.pdf(x, params[1], params[2], params[3], params[4], params[5])
-	
-	lines(x, y, "l")
-	scan()
+	# Plot the resulting pdf
+	histData = hist(samples, breaks=breaks, prob=T, col="peachpuff", xlab="Execution Time (s)")
 }
 
 # Process all files and save all plots
@@ -106,9 +103,10 @@ cat("Each entry has:", paste(names(fullDataset[[1]])), sep="\n\t$")
 hints = function(){
 	cat("
 	dataset = fullDataset[[1]]
+	samples.hist(dataset$samples[,1])
 	params = kwcwg.infer(dataset$samples[,1]);
 	params = as.matrix(params[nrow(params),])
-	kwcwg.plot(dataset$samples[,1], params[1], params[2], params[3], params[4], params[5])", "\n")
+	kwcwg.lines(dataset$samples[,1], params[1], params[2], params[3], params[4], params[5])", "\n")
 }
 
 cat("INFO: I've lodaded the dataset in the variable 'fullDataset'", "\n")

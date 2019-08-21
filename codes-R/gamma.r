@@ -44,12 +44,11 @@ gamma.infer = function(samples){
 	return(retval)
 }
 
-gamma.plot = function(samples, shape, scale){
+gamma.lines = function(samples, params, ...){
 	minVal = min(samples) * 0.9;
 	maxVal = max(samples) * 1.1;
 
-	hist(samples, prob=T, xlim=c(minVal, maxVal))
 	x = seq(minVal, maxVal, length=200)
-	y = dgamma(x, shape=shape, scale=scale)
-	lines(x, y)
+	y = dgamma(x, shape=params[1], scale=params[2])
+	lines(x, y, ...)
 }

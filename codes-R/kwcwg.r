@@ -114,12 +114,11 @@ kwcwg.infer = function(samples){
 	return(retval)
 }
 
-kwcwg.plot = function(samples, alpha, beta, gamma, a, b){
+kwcwg.lines = function(samples, params, ...){
 	minVal = min(samples) * 0.9;
 	maxVal = max(samples) * 1.1;
 
-	hist(samples, prob=T, xlim=c(minVal, maxVal))
 	x = seq(minVal, maxVal, length=200)
-	y = kwcwg.pdf(x, alpha, beta, gamma, a, b)
-	lines(x, y)
+	y = kwcwg.pdf(x, params[1], params[2], params[3], params[4], params[5])
+	lines(x, y, ...)
 }

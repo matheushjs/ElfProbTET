@@ -43,12 +43,11 @@ norm.infer = function(samples){
 	return(retval)
 }
 
-norm.plot = function(samples, mean, sd){
+norm.lines = function(samples, params, ...){
 	minVal = min(samples) * 0.9;
 	maxVal = max(samples) * 1.1;
 
-	hist(samples, prob=T, xlim=c(minVal, maxVal))
 	x = seq(minVal, maxVal, length=200)
-	y = dnorm(x, mean=mean, sd=sd)
+	y = dnorm(x, mean=params[1], sd=params[2], ...)
 	lines(x, y)
 }
