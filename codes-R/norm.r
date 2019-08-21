@@ -48,6 +48,6 @@ norm.lines = function(samples, params, ...){
 	maxVal = max(samples) * 1.1;
 
 	x = seq(minVal, maxVal, length=200)
-	y = dnorm(x, mean=params[1], sd=params[2], ...)
-	lines(x, y)
+	y = dnorm(x, mean=params[1], sd=params[2])
+	lines(x, y, ...)
 }

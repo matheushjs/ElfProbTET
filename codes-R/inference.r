@@ -83,8 +83,14 @@ generate.plots = function(fullDataset){
 			params = as.matrix(params[nrow(params),])
 			weibull.lines(samples, params, lty=3, col=3, lwd=3)
 
+			params = norm.infer(samples)
+			params = as.matrix(params[nrow(params),])
+			norm.lines(samples, params, lty=4, col=4, lwd=4)
+
 			outputName = paste(dataset$fileroot, "-", psize, ".png", sep="")
 			savePlot(outputName, type="png")
+
+			scan()
 		}
 	}
 }
@@ -103,7 +109,7 @@ hints = function(){
 	samples.hist(dataset$samples[,1])
 	params = kwcwg.infer(dataset$samples[,1]);
 	params = as.matrix(params[nrow(params),])
-	kwcwg.lines(dataset$samples[,1], params[1], params[2], params[3], params[4], params[5])
+	kwcwg.lines(dataset$samples[,1], params)
 	
 	generate.plots(fullDataset)", "\n")
 }
