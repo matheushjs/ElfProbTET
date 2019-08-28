@@ -6,9 +6,15 @@ source("./norm.r")
 
 # Returns the sample sets in each file
 # Each file has 1000 samples for each experiment made, so each sample set has 1000 entries
-get_sample_sets = function(file){
+# If zeroPositioning is TRUE, we subtract the lowest execution time from the sample, making the empirical distribution begin at zero.
+get_sample_sets = function(file, zeroPositioning=FALSE){
 	data = read.csv(file, header=F)
 	data = as.data.frame(matrix(t(data), nrow=1000))
+
+	if(zeroPositioning){
+		data = apply(data, 2, function(col){ col - min(col) })
+	}
+
 	return(data)
 }
 
@@ -36,7 +42,7 @@ experiment.files = function(){
 		machine = fileMetadata[2]
 		psizes = fileMetadata[3:length(fileMetadata)]
 
-		samples = get_sample_sets(paste("../experiments/", file, sep=""))
+		samples = get_sample_sets(paste("../experiments/", file, sep=""), zeroPositioning=TRUE)
 
 		entry$filename = file
 		entry$algorithm = algor
