@@ -3,6 +3,7 @@ source("./kwcwg.r")
 source("./weibull.r")
 source("./gamma.r")
 source("./norm.r")
+source("./gengamma.r")
 
 # Returns the sample sets in each file
 # Each file has 1000 samples for each experiment made, so each sample set has 1000 entries
@@ -93,8 +94,12 @@ generate.plots = function(fullDataset){
 			params = as.matrix(params[nrow(params),])
 			norm.lines(samples, params, lty=4, col=4, lwd=4)
 
-			legend("topright", c("KW-CWG", "Gamma", "Weibull", "Normal"),
-				   lty=1:4, col=1:4, lwd=1:4)
+			params = gengamma.infer(samples)
+			params = as.matrix(params[nrow(params),])
+			gengamma.lines(samples, params, lty=5, col=5, lwd=5)
+
+			legend("topright", c("KW-CWG", "Gamma", "Weibull", "Normal", "General Gamma"),
+				   lty=1:5, col=1:5, lwd=1:5)
 
 			outputName = paste(dataset$fileroot, "-", psize, ".png", sep="")
 			savePlot(outputName, type="png")
