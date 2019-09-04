@@ -129,6 +129,7 @@ generate.plots = function(fullDataset){
 			df = rbind(df, c("E.Weibull", paste.vector(params), paste(-retval["value"]), paste(elapsed)), stringsAsFactors=FALSE)
 
 			print(df, width=150)
+			write.csv(df, file=paste(dataset$fileroot, "-", psize, ".csv", sep=""))
 
 			legend("topright", unname(unlist(df["model"])), lty=1:nrow(df), col=1:nrow(df), lwd=3)
 
