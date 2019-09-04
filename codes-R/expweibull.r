@@ -28,12 +28,12 @@ expweibull.infer = function(samples){
 		params = c(shape, scale, family)
 		# print(params)
 		
-		cat("Optimizing with initial params:", params, "\n")
+		# cat("Optimizing with initial params:", params, "\n")
 		result = optim(params, likelihood, lower=lower, upper=upper)
 		result = optim(result$par, likelihood, lower=lower, upper=upper)
 		params = result$par
 		val = result$value
-		cat("Got params:", params, "\n")
+		# cat("Got params:", params, "\n")
 
 		retval = rbind(retval, c(params, val))
 	}

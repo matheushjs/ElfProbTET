@@ -128,8 +128,7 @@ generate.plots = function(fullDataset){
 			expweibull.lines(samples, params, lty=6, col=6, lwd=3)
 			df = rbind(df, c("E.Weibull", paste.vector(params), paste(-retval["value"]), paste(elapsed)), stringsAsFactors=FALSE)
 
-			print(df)
-			print(df["model"])
+			print(df, width=150)
 
 			legend("topright", unname(unlist(df["model"])), lty=1:nrow(df), col=1:nrow(df), lwd=3)
 

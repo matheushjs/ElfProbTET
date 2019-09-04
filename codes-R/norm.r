@@ -22,12 +22,12 @@ norm.infer = function(samples){
 			params = c(mean, sd)
 			# print(params)
 			
-			cat("Optimizing with initial params:", params, "\n")
+			# cat("Optimizing with initial params:", params, "\n")
 			result = optim(params, likelihood)
 			result = optim(result$par, likelihood)
 			params = result$par
 			val = result$value
-			cat("Got params:", params, "\n")
+			# cat("Got params:", params, "\n")
 
 			retval = rbind(retval, c(params, val))
 		}
