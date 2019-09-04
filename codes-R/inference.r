@@ -20,6 +20,17 @@ get_sample_sets = function(file, zeroPositioning=FALSE){
 	return(data)
 }
 
+paste.vector = function(vec){
+	if(length(vec) == 0)
+		return("")
+
+	retval = as.character(vec[1])
+	for(item in vec[2:length(vec)]){
+		retval = paste(retval, item)
+	}
+	return(retval)
+}
+
 # Already prepares all sample sets, with all information we might need
 # Returns a data frame with all information we need
 #    - origin file name
@@ -76,35 +87,51 @@ generate.plots = function(fullDataset){
 		for(j in 1:length(dataset$psizes)){
 			psize = dataset$psizes[j]
 			samples = dataset$samples[,j]
+			df = data.frame()
 
 			samples.hist(samples)
 
-			params = kwcwg.infer(samples)
-			params = as.matrix(params[nrow(params),])
-			kwcwg.lines(samples, params, lty=1, col=1, lwd=3)
-
-			params = gamma.infer(samples)
-			params = as.matrix(params[nrow(params),])
+			elapsed = system.time({ retval = gamma.infer(samples) })["elapsed"]
+			retval = retval[nrow(retval),]
+			params = as.numeric(retval[1:length(retval)-1])
 			gamma.lines(samples, params, lty=2, col=2, lwd=3)
+			df = rbind(df, c("Gamma", paste.vector(params), paste(-retval["value"]), paste(elapsed)), stringsAsFactors=FALSE)
+			colnames(df) = c("model", "estimates", "log-likelihood", "elapsed.time")
 
-			params = weibull.infer(samples)
-			params = as.matrix(params[nrow(params),])
+			elapsed = system.time({ retval = weibull.infer(samples) })["elapsed"]
+			retval = retval[nrow(retval),]
+			params = as.numeric(retval[1:length(retval)-1])
 			weibull.lines(samples, params, lty=3, col=3, lwd=3)
+			df = rbind(df, c("Weibull", paste.vector(params), paste(-retval["value"]), paste(elapsed)), stringsAsFactors=FALSE)
 
-			params = norm.infer(samples)
-			params = as.matrix(params[nrow(params),])
-			norm.lines(samples, params, lty=4, col=4, lwd=4)
+			elapsed = system.time({ retval = norm.infer(samples) })["elapsed"]
+			retval = retval[nrow(retval),]
+			params = as.numeric(retval[1:length(retval)-1])
+			norm.lines(samples, params, lty=4, col=4, lwd=3)
+			df = rbind(df, c("Normal", paste.vector(params), paste(-retval["value"]), paste(elapsed)), stringsAsFactors=FALSE)
 
-			params = gengamma.infer(samples)
-			params = as.matrix(params[nrow(params),])
-			gengamma.lines(samples, params, lty=5, col=5, lwd=5)
+			elapsed = system.time({ retval = kwcwg.infer(samples) })["elapsed"]
+			retval = retval[nrow(retval),]
+			params = as.numeric(retval[1:length(retval)-1])
+			kwcwg.lines(samples, params, lty=1, col=1, lwd=3)
+			df = rbind(df, c("KW-CWG", paste.vector(params), paste(-retval["value"]), paste(elapsed)), stringsAsFactors=FALSE)
 
-			params = expweibull.infer(samples)
-			params = as.matrix(params[nrow(params),])
-			expweibull.lines(samples, params, lty=6, col=6, lwd=6)
+			elapsed = system.time({ retval = gengamma.infer(samples) })["elapsed"]
+			retval = retval[nrow(retval),]
+			params = as.numeric(retval[1:length(retval)-1])
+			gengamma.lines(samples, params, lty=5, col=5, lwd=3)
+			df = rbind(df, c("G.Gamma", paste.vector(params), paste(-retval["value"]), paste(elapsed)), stringsAsFactors=FALSE)
 
-			legend("topright", c("KW-CWG", "Gamma", "Weibull", "Normal", "G.Gamma", "E.Weibull"),
-				   lty=1:6, col=1:6, lwd=1:6)
+			elapsed = system.time({ retval = expweibull.infer(samples) })["elapsed"]
+			retval = retval[nrow(retval),]
+			params = as.numeric(retval[1:length(retval)-1])
+			expweibull.lines(samples, params, lty=6, col=6, lwd=3)
+			df = rbind(df, c("E.Weibull", paste.vector(params), paste(-retval["value"]), paste(elapsed)), stringsAsFactors=FALSE)
+
+			print(df)
+			print(df["model"])
+
+			legend("topright", unname(unlist(df["model"])), lty=1:nrow(df), col=1:nrow(df), lwd=3)
 
 			outputName = paste(dataset$fileroot, "-", psize, ".png", sep="")
 			savePlot(outputName, type="png")
