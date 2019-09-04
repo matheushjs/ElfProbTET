@@ -29,8 +29,8 @@ expweibull.infer = function(samples){
 		# print(params)
 		
 		# cat("Optimizing with initial params:", params, "\n")
-		result = optim(params, likelihood, lower=lower, upper=upper)
-		result = optim(result$par, likelihood, lower=lower, upper=upper)
+		result = optim(params, likelihood, lower=lower, upper=upper, method="BFGS")
+		result = optim(result$par, likelihood, lower=lower, upper=upper, method="BFGS")
 		params = result$par
 		val = result$value
 		# cat("Got params:", params, "\n")

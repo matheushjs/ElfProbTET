@@ -22,8 +22,8 @@ gamma.infer = function(samples){
 			# print(params)
 			
 			# cat("Optimizing with initial params:", params, "\n")
-			result = optim(params, likelihood)
-			result = optim(result$par, likelihood)
+			result = optim(params, likelihood, method="BFGS")
+			result = optim(result$par, likelihood, method="BFGS")
 			params = result$par
 			val = result$value
 			# cat("Got params:", params, "\n")

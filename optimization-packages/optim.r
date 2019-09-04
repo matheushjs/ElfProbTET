@@ -14,7 +14,7 @@ initialValues = c(-8, -4, -1.5, 0, 0.5, 3, 5)
 
 for(i in 1:length(initialValues)){
 	init = initialValues[i]
-	result = optim(c(init), f)
+	result = optim(c(init), f, method="SANN")
 
 	points(init, f(init), col=i, pch=19)
 	points(result$par[1], result$value, col=i, pch=19)
