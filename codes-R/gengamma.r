@@ -6,8 +6,8 @@ gengamma.infer = function(samples){
 		# shape > 0, scale > 0, k > 0
 		allLogs = dgengamma.orig(samples, shape=params[1], scale=params[2], k=params[3], log=TRUE)
 
-		# Set all NA and Inf to 0
-		allLogs[!is.finite(allLogs)] = 0
+		# Set all NA and Inf to an irrelevant value
+		allLogs[!is.finite(allLogs)] = log(1e-300)
 
 		theSum = -sum(allLogs)
 		

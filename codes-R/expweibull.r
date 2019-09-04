@@ -10,7 +10,7 @@ expweibull.infer = function(samples){
 		allLogs = dgweibull(samples, s=params[1], m=params[2], f=params[3], log=TRUE)
 
 		# Set all NA and Inf to 0
-		allLogs[!is.finite(allLogs)] = 0
+		allLogs[!is.finite(allLogs)] = log(1e-300)
 
 		theSum = -sum(allLogs)
 		

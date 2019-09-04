@@ -7,8 +7,8 @@ weibull.infer = function(samples){
 	likelihood = function(params){
 		allLogs = log(dweibull(samples, shape=params[1], scale=params[2]))
 
-		# Set all NA and Inf to 0
-		allLogs[!is.finite(allLogs)] = 0
+		# Set all NA and Inf to an irrelevant value
+		allLogs[!is.finite(allLogs)] = log(1e-300)
 
 		theSum = -sum(allLogs)
 		

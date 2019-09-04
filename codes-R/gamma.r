@@ -2,10 +2,8 @@
 gamma.infer = function(samples){
 	# The likelihood function
 	likelihood = function(params){
-		allLogs = log(dgamma(samples, shape=params[1], scale=params[2]))
-
-		# Set all NA and Inf to 0
-		allLogs[!is.finite(allLogs)] = 0
+		allLogs = dgamma(samples, shape=params[1], scale=params[2], log=TRUE)
+		allLogs[!is.finite(allLogs)] = log(1e-300)
 
 		theSum = -sum(allLogs)
 		

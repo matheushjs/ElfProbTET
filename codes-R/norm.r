@@ -4,8 +4,8 @@ norm.infer = function(samples){
 	likelihood = function(params){
 		allLogs = log(dnorm(samples, mean=params[1], sd=params[2]))
 
-		# Set all NA and Inf to 0
-		allLogs[!is.finite(allLogs)] = 0
+		# Set all NA and Inf to an irrelevant value
+		allLogs[!is.finite(allLogs)] = log(1e-300)
 
 		theSum = -sum(allLogs)
 		

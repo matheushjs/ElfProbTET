@@ -70,8 +70,8 @@ kwcwg.infer = function(samples){
 	likelihood = function(params){
 		allLogs = log(kwcwg.pdf(samples, params[1], params[2], params[3], params[4], params[5]))
 
-		# Set all NA and Inf to 0
-		allLogs[!is.finite(allLogs)] = 0
+		# Set all NA and Inf to an irrelevant value
+		allLogs[!is.finite(allLogs)] = log(1e-300)
 
 		theSum = -sum(allLogs)
 		
