@@ -1,3 +1,4 @@
+require(GenSA)
 
 kwcwg.pdf = function(x, alpha, beta, gamma, a, b){
 	#cat("Called with", "(", x, ")", alpha, beta, gamma, a, b, "\n")
@@ -62,7 +63,7 @@ kwcwg.pdf = function(x, alpha, beta, gamma, a, b){
 }
 
 # Get the parameters of the kwcwg after fitting the samples
-kwcwg.infer = function(samples){
+kwcwg.infer = function(samples, useHeuristic=FALSE){
 	# This quantile is apparently a good estimator for the beta parameter
 	estimatedBeta = quantile(samples, p=.632)
 
@@ -80,29 +81,37 @@ kwcwg.infer = function(samples){
 
 	retval = NULL
 
+	lower = c(1e-10, 1e-10, 1e-10, 1e-10, 1e-10)
+	upper = c(1, Inf, Inf, Inf, Inf)
+
 	# We use a grid of initial values, and take the best of them
 	#for(alpha in c(0.1, 0.2, 0.4, 0.6, 0.8, 0.9)){
 	# for(beta in c(estimatedBeta*0.666, estimatedBeta, estimatedBeta*1.5)){
 	#for(gamma in c(0.1, 2, 6, 10)){
 	#for(a in c(0.1, 2, 6, 10)){
 	#for(b in c(0.1, 2, 6, 10)){
-	for(alpha in c(0.1, 0.9)){
-	for(beta in c(estimatedBeta*0.666, estimatedBeta, estimatedBeta*1.5)){
-	for(gamma in c(2, 10)){
-	for(a in c(2, 10)){
+	for(alpha in c(0.1, 0.9))
+	for(beta in c(estimatedBeta*0.666, estimatedBeta, estimatedBeta*1.5))
+	for(gamma in c(2, 10))
+	for(a in c(2, 10))
 	for(b in c(0.1, 10)){
 		params = c(alpha, beta, gamma, a, b)
 		# print(params)
 		
 		# cat("Optimizing with initial params:", params, "\n")
-		result = optim(params, likelihood, method="BFGS")
-		result = optim(result$par, likelihood, method="BFGS")
+		if(useHeuristic == FALSE){
+			result = optim(params, likelihood, method="BFGS")
+			result = optim(result$par, likelihood, method="BFGS")
+		} else {
+			result = GenSA(params, likelihood, lower=lower, upper=upper)
+		}
+
 		params = result$par
 		val = result$value
 		# cat("Got params:", params, "\n")
 
 		retval = rbind(retval, c(params, val))
-	} } } } }
+	}
 
 	retval = as.data.frame(retval)
 	colnames(retval) = c("alpha", "beta", "gamma", "a", "b", "value")

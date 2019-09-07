@@ -1,5 +1,6 @@
+require(GenSA)
 
-weibull.infer = function(samples){
+weibull.infer = function(samples, useHeuristic=FALSE){
 	# This quantile is apparently a good estimator for the beta parameter
 	estimatedBeta = quantile(samples, p=.632)
 
@@ -17,20 +18,28 @@ weibull.infer = function(samples){
 
 	retval = NULL
 
-	for(shape in c(0.5, 2, 5, 10, 20, 30, 40)){
+	lower = c(1e-10, 1e-10)
+	upper = c(Inf, Inf)
+
+	for(shape in c(0.5, 2, 5, 10, 20, 30, 40))
 	for(scale in c(estimatedBeta*0.666, estimatedBeta, estimatedBeta*1.5)){
 		params = c(shape, scale)
 		# print(params)
 		
 		# cat("Optimizing with initial params:", params, "\n")
-		result = optim(params, likelihood, method="BFGS")
-		result = optim(result$par, likelihood, method="BFGS")
+		if(useHeuristic == FALSE){
+			result = optim(params, likelihood, method="BFGS")
+			result = optim(result$par, likelihood, method="BFGS")
+		} else {
+			result = GenSA(params, likelihood, lower=lower, upper=upper)
+		}
+
 		params = result$par
 		val = result$value
 		# cat("Got params:", params, "\n")
 
 		retval = rbind(retval, c(params, val))
-	} }
+	}
 
 	retval = as.data.frame(retval)
 	colnames(retval) = c("shape", "scale", "value")

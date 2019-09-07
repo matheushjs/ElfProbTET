@@ -1,5 +1,8 @@
+require(GA)
+require(parallel)
+require(doParallel)
 
-gamma.infer = function(samples){
+gamma.infer = function(samples, useHeuristic=FALSE){
 	# The likelihood function
 	likelihood = function(params){
 		allLogs = dgamma(samples, shape=params[1], scale=params[2], log=TRUE)
@@ -12,21 +15,49 @@ gamma.infer = function(samples){
 
 	retval = NULL
 
-	for(shape in c(0.5, 2, 5, 10, 20, 100, 200, 500, 1000, 5000, 10000, 20000)){
+	lower = c(1e-10, 1e-10)
+	upper = c(2000, 2000)
+
+	if(useHeuristic == FALSE){
+		shapeList = c(0.5, 2, 5, 10, 20, 100, 200, 500, 1000, 5000, 10000, 20000)
+	} else {
+		shapeList = c(5)
+	}
+
+	for(shape in shapeList){
 		# The mean of a gamma is shape*scale
 		# So we estimate the scale as being scale = mean(samples) / shape
 		estimatedScale = mean(samples) / shape
 
-		for(scale in c(estimatedScale * 0.666, estimatedScale, estimatedScale*1.5)){
+		if(useHeuristic == FALSE){
+			scaleList = c(estimatedScale * 0.666, estimatedScale, estimatedScale*1.5)
+		} else {
+			scaleList = c(estimatedScale)
+		}
+
+		for(scale in scaleList){
 			params = c(shape, scale)
 			# print(params)
 			
-			# cat("Optimizing with initial params:", params, "\n")
-			result = optim(params, likelihood, method="BFGS")
-			result = optim(result$par, likelihood, method="BFGS")
-			params = result$par
-			val = result$value
-			# cat("Got params:", params, "\n")
+			cat("Optimizing with initial params:", params, "\n")
+			if(useHeuristic == FALSE){
+				result = optim(params, likelihood, method="BFGS")
+				result = optim(result$par, likelihood, method="BFGS")
+				params = result$par
+				val = result$value
+			} else {
+				result = ga(
+					type="real-valued",
+					fitness= function(x){ -likelihood(x) },
+					lower=lower,
+					upper=upper,
+					optim=TRUE,
+					parallel=TRUE)
+				params = result@solution
+				val = result@fitnessValue
+			}
+
+			cat("Got params:", params, "\n")
 
 			retval = rbind(retval, c(params, val))
 		}

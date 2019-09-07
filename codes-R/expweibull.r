@@ -1,6 +1,7 @@
 require(rmutil)
+require(GenSA)
 
-expweibull.infer = function(samples){
+expweibull.infer = function(samples, useHeuristic=FALSE){
 	# The likelihood function
 	likelihood = function(params){
 		# dgweibull does not accept a sample of value 0, so we fix this here
@@ -20,7 +21,7 @@ expweibull.infer = function(samples){
 	retval = NULL
 
 	lower = c(1e-10, 1e-10, 1e-10)
-	upper = Inf
+	upper = c(Inf, Inf, Inf)
 
 	for(shape in c(0.5, 2, 5, 10))
 	for(scale in c(0.5, 2, 5, 10))
@@ -29,8 +30,13 @@ expweibull.infer = function(samples){
 		# print(params)
 		
 		# cat("Optimizing with initial params:", params, "\n")
-		result = optim(params, likelihood, lower=lower, upper=upper, method="BFGS")
-		result = optim(result$par, likelihood, lower=lower, upper=upper, method="BFGS")
+		if(useHeuristic == FALSE){
+			result = optim(params, likelihood, lower=lower, upper=upper, method="BFGS")
+			result = optim(result$par, likelihood, lower=lower, upper=upper, method="BFGS")
+		} else {
+			result = GenSA(params, likelihood, lower=lower, upper=upper)
+		}
+		
 		params = result$par
 		val = result$value
 		# cat("Got params:", params, "\n")

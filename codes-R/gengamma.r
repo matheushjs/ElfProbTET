@@ -1,6 +1,7 @@
 require(flexsurv)
+require(GenSA)
 
-gengamma.infer = function(samples){
+gengamma.infer = function(samples, useHeuristic=FALSE){
 	# The likelihood function
 	likelihood = function(params){
 		# shape > 0, scale > 0, k > 0
@@ -16,6 +17,9 @@ gengamma.infer = function(samples){
 
 	retval = NULL
 
+	lower = c(1e-10, 1e-10, 1e-10)
+	upper = c(Inf, Inf, Inf)
+
 	for(shape in c(0.5, 2, 5, 10))
 	for(scale in c(0.5, 2, 5, 10))
 	for(k in c(0.5, 2, 5, 10)){
@@ -23,8 +27,13 @@ gengamma.infer = function(samples){
 		# print(params)
 		
 		# cat("Optimizing with initial params:", params, "\n")
-		result = optim(params, likelihood, method="BFGS")
-		result = optim(result$par, likelihood, method="BFGS")
+		if(useHeuristic == FALSE){
+			result = optim(params, likelihood, method="BFGS")
+			result = optim(result$par, likelihood, method="BFGS")
+		} else {
+			result = GenSA(params, likelihood, lower=lower, upper=upper)
+		}
+
 		params = result$par
 		val = result$value
 		# cat("Got params:", params, "\n")
