@@ -1,6 +1,4 @@
-require(GA)
-require(parallel)
-require(doParallel)
+require(GenSA)
 
 gamma.infer = function(samples, useHeuristic=FALSE){
 	# The likelihood function
@@ -39,25 +37,17 @@ gamma.infer = function(samples, useHeuristic=FALSE){
 			params = c(shape, scale)
 			# print(params)
 			
-			cat("Optimizing with initial params:", params, "\n")
+			#cat("Optimizing with initial params:", params, "\n")
 			if(useHeuristic == FALSE){
 				result = optim(params, likelihood, method="BFGS")
 				result = optim(result$par, likelihood, method="BFGS")
-				params = result$par
-				val = result$value
 			} else {
-				result = ga(
-					type="real-valued",
-					fitness= function(x){ -likelihood(x) },
-					lower=lower,
-					upper=upper,
-					optim=TRUE,
-					parallel=TRUE)
-				params = result@solution
-				val = result@fitnessValue
+				result = GenSA(params, likelihood, lower=lower, upper=upper)
 			}
 
-			cat("Got params:", params, "\n")
+			params = result$par
+			val = result$value
+			#cat("Got params:", params, "\n")
 
 			retval = rbind(retval, c(params, val))
 		}
