@@ -55,7 +55,7 @@ experiment.files = function(){
 		machine = fileMetadata[2]
 		psizes = fileMetadata[3:length(fileMetadata)]
 
-		samples = get_sample_sets(paste("../experiments/", file, sep=""), zeroPositioning=TRUE)
+		samples = get_sample_sets(paste("../experiments/", file, sep=""), zeroPositioning=FALSE)
 
 		entry$filename = file
 		entry$algorithm = algor
@@ -71,12 +71,12 @@ experiment.files = function(){
 }
 
 # Plots a "histogram" of the dataset
-samples.hist = function(samples, breaks=20){
+samples.hist = function(samples, breaks=20, main=""){
 	minVal = min(samples) * 0.9;
 	maxVal = max(samples) * 1.1;
 
 	# Plot the resulting pdf
-	histData = hist(samples, breaks=breaks, prob=T, col="peachpuff", xlab="Execution Time (s)")
+	histData = hist(samples, breaks=breaks, prob=T, col="peachpuff", xlab="Execution Time (s)", main=main)
 }
 
 # Process all files and save all plots
@@ -89,7 +89,7 @@ generate.plots = function(fullDataset){
 			samples = dataset$samples[,j]
 			df = data.frame()
 
-			samples.hist(samples)
+			samples.hist(samples, main=paste(capitalize(dataset$algorithm), capitalize(dataset$machine), psize, sep="-"))
 
 			elapsed = system.time({ retval = gamma.infer(samples) })["elapsed"]
 			retval = retval[nrow(retval),]
