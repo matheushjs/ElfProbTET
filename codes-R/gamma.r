@@ -1,10 +1,23 @@
 require(GenSA)
 
 gamma.infer = function(samples, useHeuristic=FALSE){
+	isZero = which(samples == 0)
+	samples[isZero] = min(samples[-isZero])
+
 	# The likelihood function
 	likelihood = function(params){
 		allLogs = dgamma(samples, shape=params[1], scale=params[2], log=TRUE)
-		allLogs[!is.finite(allLogs)] = log(1e-300)
+
+		problems = which(!is.finite(allLogs))
+		if(length(problems) > 0 && length(problems) <= 5){
+			allLogs[problems] = min(allLogs[-problems])
+		} else {
+			allLogs[problems] = log(1e-300)
+		}
+
+		if(length(problems) > 0 && length(problems) < 5){
+			warning(paste("gamma: Low amount (<5) of warnings at points:", samples[problems]), call.=FALSE)
+		}
 
 		theSum = -sum(allLogs)
 		

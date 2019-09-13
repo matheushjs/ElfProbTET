@@ -1,12 +1,23 @@
 require(GenSA)
 
 norm.infer = function(samples, useHeuristic=FALSE){
+	isZero = which(samples == 0)
+	samples[isZero] = min(samples[-isZero])
+
 	# The likelihood function
 	likelihood = function(params){
-		allLogs = log(dnorm(samples, mean=params[1], sd=params[2]))
+		allLogs = dnorm(samples, mean=params[1], sd=params[2], log=TRUE)
 
-		# Set all NA and Inf to an irrelevant value
-		allLogs[!is.finite(allLogs)] = log(1e-300)
+		problems = which(!is.finite(allLogs))
+		if(length(problems) > 0 && length(problems) <= 5){
+			allLogs[problems] = min(allLogs[-problems])
+		} else {
+			allLogs[problems] = log(1e-300)
+		}
+
+		if(length(problems) > 0 && length(problems) < 5){
+			warning(paste("norm: Low amount (<5) of warnings at points:", samples[problems]), call.=FALSE)
+		}
 
 		theSum = -sum(allLogs)
 		

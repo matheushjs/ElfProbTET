@@ -2,13 +2,24 @@ require(flexsurv)
 require(GenSA)
 
 gengamma.infer = function(samples, useHeuristic=FALSE){
+	isZero = which(samples == 0)
+	samples[isZero] = min(samples[-isZero])
+
 	# The likelihood function
 	likelihood = function(params){
 		# shape > 0, scale > 0, k > 0
 		allLogs = dgengamma.orig(samples, shape=params[1], scale=params[2], k=params[3], log=TRUE)
 
-		# Set all NA and Inf to an irrelevant value
-		allLogs[!is.finite(allLogs)] = log(1e-300)
+		problems = which(!is.finite(allLogs))
+		if(length(problems) > 0 && length(problems) <= 5){
+			allLogs[problems] = min(allLogs[-problems])
+		} else {
+			allLogs[problems] = log(1e-300)
+		}
+
+		if(length(problems) > 0 && length(problems) < 5){
+			warning(paste("gengamma: Low amount (<5) of warnings at points:", samples[problems]), call.=FALSE)
+		}
 
 		theSum = -sum(allLogs)
 		

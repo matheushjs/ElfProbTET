@@ -2,16 +2,25 @@ require(rmutil)
 require(GenSA)
 
 expweibull.infer = function(samples, useHeuristic=FALSE){
+	# dgweibull does not accept a sample of value 0, so we fix this here
+	isZero = which(samples == 0)
+	samples[isZero] = min(samples[-isZero])
+
 	# The likelihood function
 	likelihood = function(params){
-		# dgweibull does not accept a sample of value 0, so we fix this here
-		samples[samples == 0] = 1e-100
-
 		# shape s > 0, scale m > 0, family f > 0
 		allLogs = dgweibull(samples, s=params[1], m=params[2], f=params[3], log=TRUE)
 
-		# Set all NA and Inf to 0
-		allLogs[!is.finite(allLogs)] = log(1e-300)
+		problems = which(!is.finite(allLogs))
+		if(length(problems) > 0 && length(problems) <= 5){
+			allLogs[problems] = min(allLogs[-problems])
+		} else {
+			allLogs[problems] = log(1e-300)
+		}
+
+		if(length(problems) > 0 && length(problems) < 5){
+			warning(paste("expweibul: Low amount (<5) of warnings at points:", samples[problems]), call.=FALSE)
+		}
 
 		theSum = -sum(allLogs)
 		

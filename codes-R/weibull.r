@@ -1,15 +1,26 @@
 require(GenSA)
 
 weibull.infer = function(samples, useHeuristic=FALSE){
+	isZero = which(samples == 0)
+	samples[isZero] = min(samples[-isZero])
+
 	# This quantile is apparently a good estimator for the beta parameter
 	estimatedBeta = quantile(samples, p=.632)
 
 	# The likelihood function
 	likelihood = function(params){
-		allLogs = log(dweibull(samples, shape=params[1], scale=params[2]))
+		allLogs = dweibull(samples, shape=params[1], scale=params[2], log=TRUE)
 
-		# Set all NA and Inf to an irrelevant value
-		allLogs[!is.finite(allLogs)] = log(1e-300)
+		problems = which(!is.finite(allLogs))
+		if(length(problems) > 0 && length(problems) <= 5){
+			allLogs[problems] = min(allLogs[-problems])
+		} else {
+			allLogs[problems] = log(1e-300)
+		}
+
+		if(length(problems) > 0 && length(problems) < 5){
+			warning(paste("weibull: Low amount (<5) of warnings at points:", samples[problems]), call.=FALSE)
+		}
 
 		theSum = -sum(allLogs)
 		

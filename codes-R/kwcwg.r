@@ -67,12 +67,23 @@ kwcwg.infer = function(samples, useHeuristic=FALSE){
 	# This quantile is apparently a good estimator for the beta parameter
 	estimatedBeta = quantile(samples, p=.632)
 
+	isZero = which(samples == 0)
+	samples[isZero] = min(samples[-isZero])
+
 	# The likelihood function
 	likelihood = function(params){
 		allLogs = log(kwcwg.pdf(samples, params[1], params[2], params[3], params[4], params[5]))
 
-		# Set all NA and Inf to an irrelevant value
-		allLogs[!is.finite(allLogs)] = log(1e-300)
+		problems = which(!is.finite(allLogs))
+		if(length(problems) > 0 && length(problems) <= 5){
+			allLogs[problems] = min(allLogs[-problems])
+		} else {
+			allLogs[problems] = log(1e-300)
+		}
+
+		if(length(problems) > 0 && length(problems) < 5){
+			warning(paste("kwcwg: Low amount (<5) of warnings at points:", samples[problems]), call.=FALSE)
+		}
 
 		theSum = -sum(allLogs)
 		
