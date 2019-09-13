@@ -64,10 +64,11 @@ gamma.infer = function(samples, useHeuristic=FALSE){
 }
 
 gamma.lines = function(samples, params, ...){
-	minVal = min(samples) * 0.9;
-	maxVal = max(samples) * 1.1;
+	delta = diff(quantile(samples, c(0.05, 0.95)))
+	minVal = min(samples) - 0.95*delta;
+	maxVal = max(samples) + 1.05*delta;
 
-	x = seq(minVal, maxVal, length=200)
+	x = seq(minVal, maxVal, length=1000)
 	y = dgamma(x, shape=params[1], scale=params[2])
 	lines(x, y, ...)
 }

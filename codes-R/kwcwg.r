@@ -124,10 +124,11 @@ kwcwg.infer = function(samples, useHeuristic=FALSE){
 }
 
 kwcwg.lines = function(samples, params, ...){
-	minVal = min(samples) * 0.9;
-	maxVal = max(samples) * 1.1;
+	delta = diff(quantile(samples, c(0.05, 0.95)))
+	minVal = min(samples) - 0.95*delta;
+	maxVal = max(samples) + 1.05*delta;
 
-	x = seq(minVal, maxVal, length=200)
+	x = seq(minVal, maxVal, length=1000)
 	y = kwcwg.pdf(x, params[1], params[2], params[3], params[4], params[5])
 	lines(x, y, ...)
 }

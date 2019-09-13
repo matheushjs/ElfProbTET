@@ -55,10 +55,11 @@ expweibull.infer = function(samples, useHeuristic=FALSE){
 }
 
 expweibull.lines = function(samples, params, ...){
-	minVal = min(samples) * 0.9;
-	maxVal = max(samples) * 1.1;
+	delta = diff(quantile(samples, c(0.05, 0.95)))
+	minVal = min(samples) - 0.95*delta;
+	maxVal = max(samples) + 1.05*delta;
 
-	x = seq(minVal, maxVal, length=200)
+	x = seq(minVal, maxVal, length=1000)
 	x[x == 0] = 1e-100
 	y = dgweibull(x, s=params[1], m=params[2], f=params[3])
 	lines(x, y, ...)

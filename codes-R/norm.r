@@ -52,10 +52,11 @@ norm.infer = function(samples, useHeuristic=FALSE){
 }
 
 norm.lines = function(samples, params, ...){
-	minVal = min(samples) * 0.9;
-	maxVal = max(samples) * 1.1;
+	delta = diff(quantile(samples, c(0.05, 0.95)))
+	minVal = min(samples) - 0.95*delta;
+	maxVal = max(samples) + 1.05*delta;
 
-	x = seq(minVal, maxVal, length=200)
+	x = seq(minVal, maxVal, length=1000)
 	y = dnorm(x, mean=params[1], sd=params[2])
 	lines(x, y, ...)
 }

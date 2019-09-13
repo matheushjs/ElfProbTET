@@ -8,14 +8,9 @@ source("./expweibull.r")
 
 # Returns the sample sets in each file
 # Each file has 1000 samples for each experiment made, so each sample set has 1000 entries
-# If zeroPositioning is TRUE, we subtract the lowest execution time from the sample, making the empirical distribution begin at zero.
-get_sample_sets = function(file, zeroPositioning=FALSE){
+get_sample_sets = function(file){
 	data = read.csv(file, header=F)
 	data = as.data.frame(matrix(t(data), nrow=1000))
-
-	if(zeroPositioning){
-		data = apply(data, 2, function(col){ col - min(col) })
-	}
 
 	return(data)
 }
@@ -55,7 +50,7 @@ experiment.files = function(){
 		machine = fileMetadata[2]
 		psizes = fileMetadata[3:length(fileMetadata)]
 
-		samples = get_sample_sets(paste("../experiments/", file, sep=""), zeroPositioning=FALSE)
+		samples = get_sample_sets(paste("../experiments/", file, sep=""))
 
 		entry$filename = file
 		entry$algorithm = algor
@@ -71,16 +66,20 @@ experiment.files = function(){
 }
 
 # Plots a "histogram" of the dataset
-samples.hist = function(samples, breaks=20, main=""){
-	minVal = min(samples) * 0.9;
-	maxVal = max(samples) * 1.1;
+samples.hist = function(samples, breaks=20, main="", xmin=NULL){
+	delta = diff(quantile(samples, c(0.05, 0.95)))
+	limits = as.numeric(quantile(samples, c(0.05, 0.95))) + c(-0.95*delta, 1.05*delta)
+
+	if(is.numeric(xmin))
+		limits[1] = xmin
 
 	# Plot the resulting pdf
-	histData = hist(samples, breaks=breaks, prob=T, col="peachpuff", xlab="Execution Time (s)", main=main)
+	histData = hist(samples, breaks=breaks, prob=T, col="peachpuff", xlab="Execution Time (s)", main=main, xlim=limits)
 }
 
 # Process all files and save all plots
-generate.plots = function(fullDataset, useHeuristic=FALSE){
+# If zeroPositioning is TRUE, we subtract the lowest execution time from the sample, making the empirical distribution begin at zero.
+generate.plots = function(fullDataset, zeroPositioning=FALSE, useHeuristic=FALSE){
 	for(i in 1:length(fullDataset)){
 		dataset = fullDataset[[i]]
 
@@ -88,8 +87,14 @@ generate.plots = function(fullDataset, useHeuristic=FALSE){
 			psize = dataset$psizes[j]
 			samples = dataset$samples[,j]
 			df = data.frame()
+			histMinX = NULL
 
-			samples.hist(samples, main=paste(capitalize(dataset$algorithm), capitalize(dataset$machine), psize, sep="-"))
+			if(zeroPositioning){
+				samples = samples - min(samples)
+				histMinX = 0
+			}
+
+			samples.hist(samples, main=paste(capitalize(dataset$algorithm), capitalize(dataset$machine), psize, sep="-"), xmin=histMinX)
 
 			elapsed = system.time({ retval = gamma.infer(samples, useHeuristic) })["elapsed"]
 			retval = retval[nrow(retval),]
