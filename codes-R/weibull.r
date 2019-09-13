@@ -56,6 +56,9 @@ weibull.lines = function(samples, params, ...){
 	minVal = min(samples) - 0.95*delta;
 	maxVal = max(samples) + 1.05*delta;
 
+	if(minVal <= 0)
+		minVal = 1e-100
+
 	x = seq(minVal, maxVal, length=1000)
 	y = dweibull(x, shape=params[1], scale=params[2])
 	lines(x, y, ...)
