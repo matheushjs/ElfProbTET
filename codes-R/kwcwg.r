@@ -85,10 +85,10 @@ kwcwg.infer = function(samples, useHeuristic=FALSE){
 	upper = c(1, Inf, Inf, Inf, Inf)
 
 	# We use a grid of initial values, and take the best of them
-	#for(alpha in c(0.1, 0.2, 0.4, 0.6, 0.8, 0.9)){
-	# for(beta in c(estimatedBeta*0.666, estimatedBeta, estimatedBeta*1.5)){
-	#for(gamma in c(0.1, 2, 6, 10)){
-	#for(a in c(0.1, 2, 6, 10)){
+	#for(alpha in c(0.1, 0.2, 0.4, 0.6, 0.8, 0.9))
+	#for(beta in c(estimatedBeta*0.666, estimatedBeta, estimatedBeta*1.5))
+	#for(gamma in c(0.1, 2, 6, 10))
+	#for(a in c(0.1, 2, 6, 10))
 	#for(b in c(0.1, 2, 6, 10)){
 	for(alpha in c(0.1, 0.9))
 	for(beta in c(estimatedBeta*0.666, estimatedBeta, estimatedBeta*1.5))

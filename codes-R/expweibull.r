@@ -58,6 +58,9 @@ expweibull.lines = function(samples, params, ...){
 	delta = diff(quantile(samples, c(0.05, 0.95)))
 	minVal = min(samples) - 0.95*delta;
 	maxVal = max(samples) + 1.05*delta;
+	
+	if(minVal <= 0)
+		minVal = 1e-100
 
 	x = seq(minVal, maxVal, length=1000)
 	x[x == 0] = 1e-100
