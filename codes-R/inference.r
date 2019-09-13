@@ -94,44 +94,46 @@ generate.plots = function(fullDataset, zeroPositioning=FALSE, useHeuristic=FALSE
 				histMinX = 0
 			}
 
-			samples.hist(samples, main=paste(capitalize(dataset$algorithm), capitalize(dataset$machine), psize, sep="-"), xmin=histMinX)
+			title = paste(capitalize(dataset$algorithm), capitalize(dataset$machine), psize, sep="-")
+
+			samples.hist(samples, main=title, xmin=histMinX)
 
 			elapsed = system.time({ retval = gamma.infer(samples, useHeuristic) })["elapsed"]
 			retval = retval[nrow(retval),]
 			params = as.numeric(retval[1:length(retval)-1])
 			gamma.lines(samples, params, lty=2, col=2, lwd=3)
-			df = rbind(df, c("Gamma", paste.vector(params), paste(-retval["value"]), paste(elapsed)), stringsAsFactors=FALSE)
-			colnames(df) = c("model", "estimates", "log-likelihood", "elapsed.time")
+			df = rbind(df, c(title, "Gamma", paste.vector(params), paste(-retval["value"]), paste(elapsed)), stringsAsFactors=FALSE)
+			colnames(df) = c("title", "model", "estimates", "log-likelihood", "elapsed.time")
 
 			elapsed = system.time({ retval = weibull.infer(samples, useHeuristic) })["elapsed"]
 			retval = retval[nrow(retval),]
 			params = as.numeric(retval[1:length(retval)-1])
 			weibull.lines(samples, params, lty=3, col=3, lwd=3)
-			df = rbind(df, c("Weibull", paste.vector(params), paste(-retval["value"]), paste(elapsed)), stringsAsFactors=FALSE)
+			df = rbind(df, c(title, "Weibull", paste.vector(params), paste(-retval["value"]), paste(elapsed)), stringsAsFactors=FALSE)
 
 			elapsed = system.time({ retval = norm.infer(samples, useHeuristic) })["elapsed"]
 			retval = retval[nrow(retval),]
 			params = as.numeric(retval[1:length(retval)-1])
 			norm.lines(samples, params, lty=4, col=4, lwd=3)
-			df = rbind(df, c("Normal", paste.vector(params), paste(-retval["value"]), paste(elapsed)), stringsAsFactors=FALSE)
+			df = rbind(df, c(title, "Normal", paste.vector(params), paste(-retval["value"]), paste(elapsed)), stringsAsFactors=FALSE)
 
 			elapsed = system.time({ retval = kwcwg.infer(samples, useHeuristic) })["elapsed"]
 			retval = retval[nrow(retval),]
 			params = as.numeric(retval[1:length(retval)-1])
 			kwcwg.lines(samples, params, lty=1, col=1, lwd=3)
-			df = rbind(df, c("KW-CWG", paste.vector(params), paste(-retval["value"]), paste(elapsed)), stringsAsFactors=FALSE)
+			df = rbind(df, c(title, "KW-CWG", paste.vector(params), paste(-retval["value"]), paste(elapsed)), stringsAsFactors=FALSE)
 
 			elapsed = system.time({ retval = gengamma.infer(samples, useHeuristic) })["elapsed"]
 			retval = retval[nrow(retval),]
 			params = as.numeric(retval[1:length(retval)-1])
 			gengamma.lines(samples, params, lty=5, col=5, lwd=3)
-			df = rbind(df, c("G.Gamma", paste.vector(params), paste(-retval["value"]), paste(elapsed)), stringsAsFactors=FALSE)
+			df = rbind(df, c(title, "G.Gamma", paste.vector(params), paste(-retval["value"]), paste(elapsed)), stringsAsFactors=FALSE)
 
 			elapsed = system.time({ retval = expweibull.infer(samples, useHeuristic) })["elapsed"]
 			retval = retval[nrow(retval),]
 			params = as.numeric(retval[1:length(retval)-1])
 			expweibull.lines(samples, params, lty=6, col=6, lwd=3)
-			df = rbind(df, c("E.Weibull", paste.vector(params), paste(-retval["value"]), paste(elapsed)), stringsAsFactors=FALSE)
+			df = rbind(df, c(title, "E.Weibull", paste.vector(params), paste(-retval["value"]), paste(elapsed)), stringsAsFactors=FALSE)
 
 			print(df, width=150)
 			write.csv(df, file=paste(dataset$fileroot, "-", psize, ".csv", sep=""))
