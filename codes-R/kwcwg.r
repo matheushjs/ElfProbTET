@@ -1,79 +1,84 @@
 require(GenSA)
 require(elfDistr)
 
-#kwcwg.pdf = function(x, alpha, beta, gamma, a, b){
-#	#cat("Called with", "(", x, ")", alpha, beta, gamma, a, b, "\n")
-#	
-#	# If parameters are not within valid range, return 0
-#	if(  sum(x < 0) > 0
-#	  || alpha < 0 || alpha > 1
-#	  || beta < 0
-#	  || gamma < 0
-#	  || a < 0
-#	  || b < 0
-#	){
-#		return(rep(0, length(x)));
-#	}
-#	
-#	# Original function
-#	# return(
-#	#	alpha**a * beta * gamma * a * b * (gamma * x)**(beta-1) * exp(-(gamma*x)**beta) *
-#	#	(
-#	#		(1 - exp(-(gamma*x)**beta))**(a-1) /
-#	#		(alpha + (1 - alpha)*exp(-(gamma*x)**beta))**(a+1)
-#	#	) *
-#	#	(
-#	#		1 -
-#	#		(alpha**a*(1 - exp(-(gamma*x)**beta))**a) /
-#	#		(alpha + (1-alpha)*exp(-(gamma*x)**beta))**a
-#	#	)**(b-1)
-#	#)
-#	
-#	# A common term in the equation
-#	aux1 = exp(-(gamma*x)**beta)
-#	
-#	# Here we will factor f(x) as being A * (B/C) * (1 - D/E)^(b-1)
-#	A = alpha**a * beta * gamma * a * b * (gamma * x)**(beta-1) * aux1
-#	B = 1 - aux1
-#	C = alpha + (1 - alpha)*aux1
-#	D = (alpha**a * (1 - aux1)**a)
-#	E = (alpha + (1-alpha)*aux1)**a
-#	
-#	# cat("A", A, "\n")
-#	# cat("B", B, "\n")
-#	# cat("C", C, "\n")
-#	# cat("D", D, "\n")
-#	# cat("E", E, "\n")
-#	
-#	result = A * (B**(a-1)/C**(a+1)) * (1 - D/E)**(b-1)
-#	
-#	return(result)
-#	
-#	# Old way
-#	# logA = log(A)
-#	# logB = (a-1)*log(B)
-#	# logC = (a+1)*log(C)
-#	# logDE = (b-1)*log(1 - D/(E))
-#	
-#	# result = exp(logA + logB - logC + logDE)
-#	
-#	# Set to 0 all results that are not finite
-#	# result[!is.finite(result)] = 0
-#	
-#	#return(result)
-#}
+kwcwg.pdf = function(x, alpha, beta, gamma, a, b){
+	#cat("Called with", "(", x, ")", alpha, beta, gamma, a, b, "\n")
+	
+	# If parameters are not within valid range, return 0
+	if(  sum(x < 0) > 0
+	  || alpha < 0 || alpha > 1
+	  || beta < 0
+	  || gamma < 0
+	  || a < 0
+	  || b < 0
+	){
+		return(rep(0, length(x)));
+	}
+	
+	# Original function
+	# return(
+	#	alpha**a * beta * gamma * a * b * (gamma * x)**(beta-1) * exp(-(gamma*x)**beta) *
+	#	(
+	#		(1 - exp(-(gamma*x)**beta))**(a-1) /
+	#		(alpha + (1 - alpha)*exp(-(gamma*x)**beta))**(a+1)
+	#	) *
+	#	(
+	#		1 -
+	#		(alpha**a*(1 - exp(-(gamma*x)**beta))**a) /
+	#		(alpha + (1-alpha)*exp(-(gamma*x)**beta))**a
+	#	)**(b-1)
+	#)
+	
+	# A common term in the equation
+	aux1 = exp(-(gamma*x)**beta)
+	
+	# Here we will factor f(x) as being A * (B/C) * (1 - D/E)^(b-1)
+	A = alpha**a * beta * gamma * a * b * (gamma * x)**(beta-1) * aux1
+	B = 1 - aux1
+	C = alpha + (1 - alpha)*aux1
+	D = (alpha**a * (1 - aux1)**a)
+	E = (alpha + (1-alpha)*aux1)**a
+	
+	# cat("A", A, "\n")
+	# cat("B", B, "\n")
+	# cat("C", C, "\n")
+	# cat("D", D, "\n")
+	# cat("E", E, "\n")
+	
+	result = A * (B**(a-1)/C**(a+1)) * (1 - D/E)**(b-1)
+	
+	return(result)
+	
+	# Old way
+	# logA = log(A)
+	# logB = (a-1)*log(B)
+	# logC = (a+1)*log(C)
+	# logDE = (b-1)*log(1 - D/(E))
+	
+	# result = exp(logA + logB - logC + logDE)
+	
+	# Set to 0 all results that are not finite
+	# result[!is.finite(result)] = 0
+	
+	#return(result)
+}
 
 # Get the parameters of the kwcwg after fitting the samples
-kwcwg.infer = function(samples, useHeuristic=FALSE){
+# @param useHeuristic Tells us to use genetic algorithm as optimization function.
+# @param useC Tells us to also estimate parameter C, which is the amount to subtract from the samples.
+kwcwg.infer = function(samples, useHeuristic=FALSE, useC=FALSE){
 	# This quantile is apparently a good estimator for the beta parameter
 	estimatedBeta = quantile(samples, p=.632)
 
 	isZero = which(samples == 0)
 	samples[isZero] = min(samples[-isZero])
 
+	# This will be shared between likelihood.base and likelihood.c
+	ourSamples = samples
+
 	# The likelihood function
 	likelihood = function(params){
-		allLogs = dkwcwg(samples, params[1], params[2], params[3], params[4], params[5], log=T)
+		allLogs = dkwcwg(ourSamples, params[1], params[2], params[3], params[4], params[5], log=T)
 
 		problems = which(!is.finite(allLogs))
 		if(length(problems) > 0 && length(problems) <= 5){
@@ -83,7 +88,7 @@ kwcwg.infer = function(samples, useHeuristic=FALSE){
 		}
 
 		if(length(problems) > 0 && length(problems) < 5){
-			warning(paste("kwcwg: Low amount (<5) of warnings at points:", samples[problems]), call.=FALSE)
+			warning(paste("kwcwg: Low amount (<5) of warnings at points:", ourSamples[problems]), call.=FALSE)
 		}
 
 		theSum = -sum(allLogs)

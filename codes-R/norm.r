@@ -1,12 +1,17 @@
 require(GenSA)
 
+# @param useHeuristic Tells us to use genetic algorithm as optimization function.
+# @param useC Tells us to also estimate parameter C, which is the amount to subtract from the samples.
 norm.infer = function(samples, useHeuristic=FALSE){
 	isZero = which(samples == 0)
 	samples[isZero] = min(samples[-isZero])
 
+	# This will be shared between likelihood.base and likelihood.c
+	ourSamples = samples
+
 	# The likelihood function
 	likelihood = function(params){
-		allLogs = dnorm(samples, mean=params[1], sd=params[2], log=TRUE)
+		allLogs = dnorm(ourSamples, mean=params[1], sd=params[2], log=TRUE)
 
 		problems = which(!is.finite(allLogs))
 		if(length(problems) > 0 && length(problems) <= 5){
@@ -16,7 +21,7 @@ norm.infer = function(samples, useHeuristic=FALSE){
 		}
 
 		if(length(problems) > 0 && length(problems) < 5){
-			warning(paste("norm: Low amount (<5) of warnings at points:", samples[problems]), call.=FALSE)
+			warning(paste("norm: Low amount (<5) of warnings at points:", ourSamples[problems]), call.=FALSE)
 		}
 
 		theSum = -sum(allLogs)
