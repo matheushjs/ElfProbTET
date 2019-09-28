@@ -4,7 +4,7 @@ source("kwcwg.r")
 
 setOption("width", 150)
 
-x = seq(0.1, 2, length=50000)
+x = seq(0.1, 2, length=150000)
 
 result = microbenchmark(
 	kwcwg.pdf(1, 0.5, 1, 1, 1, 1),
