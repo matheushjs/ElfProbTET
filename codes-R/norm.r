@@ -1,12 +1,18 @@
 require(GenSA)
 
-norm.infer = function(samples, useHeuristic=FALSE){
+# @param useHeuristic Tells us to use genetic algorithm as optimization function.
+# @param useC Tells us to also estimate parameter C, which is the amount to subtract from the samples.
+norm.infer = function(samples, useHeuristic=FALSE, useC=FALSE){
+	estimatedC    = min(samples) * 0.995
+
 	isZero = which(samples == 0)
 	samples[isZero] = min(samples[-isZero])
 
 	# The likelihood function
-	likelihood = function(params){
-		allLogs = dnorm(samples, mean=params[1], sd=params[2], log=TRUE)
+	likelihood = function(params, C=0){
+		ourSamples = samples - C
+
+		allLogs = dnorm(ourSamples, mean=params[1], sd=params[2], log=TRUE)
 
 		problems = which(!is.finite(allLogs))
 		if(length(problems) > 0 && length(problems) <= 5){
@@ -16,7 +22,7 @@ norm.infer = function(samples, useHeuristic=FALSE){
 		}
 
 		if(length(problems) > 0 && length(problems) < 5){
-			warning(paste("norm: Low amount (<5) of warnings at points:", samples[problems]), call.=FALSE)
+			warning(paste("norm: Low amount (<5) of warnings at points:", ourSamples[problems]), call.=FALSE)
 		}
 
 		theSum = -sum(allLogs)
@@ -29,18 +35,30 @@ norm.infer = function(samples, useHeuristic=FALSE){
 
 	retval = NULL
 
-	lower = c(-Inf, 1e-10)
-	upper = c(Inf, Inf)
+	if(useC == FALSE){
+		lower = c(-Inf, 1e-10)
+		upper = c(Inf, Inf)
+	} else {
+		lower = c(-Inf, 1e-10, 1e-10)
+		upper = c(Inf, Inf, min(samples) - 1e-10)
+	}
 
 	for(sd in c(sampleSd*0.666, sampleSd, sampleSd*1.5))
 	for(mean in c(sampleMean* 0.666, sampleMean, sampleMean*1.5)){
 		params = c(mean, sd)
+		if(useC)
+			params = c(params, estimatedC)
 		# print(params)
 		
 		# cat("Optimizing with initial params:", params, "\n")
 		if(useHeuristic == FALSE){
-			result = optim(params, likelihood, method="BFGS")
-			result = optim(result$par, likelihood, method="BFGS")
+			if(useC == FALSE){
+				result = optim(params, function(p) likelihood(p), lower=lower, upper=upper, method="BFGS")
+				result = optim(result$par, function(p) likelihood(p), lower=lower, upper=upper, method="BFGS")
+			} else {
+				result = optim(params, function(p) likelihood(p, p[length(p)]), lower=lower, upper=upper, method="BFGS")
+				result = optim(result$par, function(p) likelihood(p, p[length(p)]), lower=lower, upper=upper, method="BFGS")
+			}
 		} else {
 			result = GenSA(params, likelihood, lower=lower, upper=upper)
 		}
@@ -53,7 +71,11 @@ norm.infer = function(samples, useHeuristic=FALSE){
 	}
 
 	retval = as.data.frame(retval)
-	colnames(retval) = c("mean", "stdDev", "value")
+	if(useC == FALSE){
+		colnames(retval) = c("mean", "stdDev", "value")
+	} else {
+		colnames(retval) = c("mean", "stdDev", "c", "value")
+	}
 
 	# We sort it by value
 	sortedIdx = sort.list(retval$value, decreasing=TRUE)
@@ -62,7 +84,7 @@ norm.infer = function(samples, useHeuristic=FALSE){
 	return(retval)
 }
 
-norm.lines = function(samples, params, ...){
+norm.lines = function(samples, params, useC=FALSE, ...){
 	delta = diff(quantile(samples, c(0.05, 0.95)))
 	minVal = min(samples) - 0.95*delta;
 	maxVal = max(samples) + 1.05*delta;
@@ -70,7 +92,16 @@ norm.lines = function(samples, params, ...){
 	if(minVal <= 0)
 		minVal = 1e-100
 
+	if(useC){
+		minVal = minVal - params[length(params)]
+		maxVal = maxVal - params[length(params)]
+	}
+
 	x = seq(minVal, maxVal, length=1000)
 	y = dnorm(x, mean=params[1], sd=params[2])
+
+	if(useC)
+		x = x + params[length(params)]
+
 	lines(x, y, ...)
 }

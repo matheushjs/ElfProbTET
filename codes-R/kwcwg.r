@@ -64,16 +64,21 @@ require(elfDistr)
 #}
 
 # Get the parameters of the kwcwg after fitting the samples
-kwcwg.infer = function(samples, useHeuristic=FALSE){
+# @param useHeuristic Tells us to use genetic algorithm as optimization function.
+# @param useC Tells us to also estimate parameter C, which is the amount to subtract from the samples.
+kwcwg.infer = function(samples, useHeuristic=FALSE, useC=FALSE){
 	# This quantile is apparently a good estimator for the beta parameter
 	estimatedBeta = quantile(samples, p=.632)
+	estimatedC    = min(samples) * 0.995
 
 	isZero = which(samples == 0)
 	samples[isZero] = min(samples[-isZero])
 
 	# The likelihood function
-	likelihood = function(params){
-		allLogs = dkwcwg(samples, params[1], params[2], params[3], params[4], params[5], log=T)
+	likelihood = function(params, C=0){
+		ourSamples = samples - C;
+
+		allLogs = dkwcwg(ourSamples, params[1], params[2], params[3], params[4], params[5], log=T)
 
 		problems = which(!is.finite(allLogs))
 		if(length(problems) > 0 && length(problems) <= 5){
@@ -83,7 +88,7 @@ kwcwg.infer = function(samples, useHeuristic=FALSE){
 		}
 
 		if(length(problems) > 0 && length(problems) < 5){
-			warning(paste("kwcwg: Low amount (<5) of warnings at points:", samples[problems]), call.=FALSE)
+			warning(paste("kwcwg: Low amount (<5) of warnings at points:", ourSamples[problems]), call.=FALSE)
 		}
 
 		theSum = -sum(allLogs)
@@ -93,8 +98,13 @@ kwcwg.infer = function(samples, useHeuristic=FALSE){
 
 	retval = NULL
 
-	lower = c(1e-10, 1e-10, 1e-10, 1e-10, 1e-10)
-	upper = c(1, Inf, Inf, Inf, Inf)
+	if(useC == FALSE){
+		lower = c(1e-10, 1e-10, 1e-10, 1e-10, 1e-10)
+		upper = c(1, Inf, Inf, Inf, Inf)
+	} else {
+		lower = c(1e-10, 1e-10, 1e-10, 1e-10, 1e-10, 1e-10)
+		upper = c(1, Inf, Inf, Inf, Inf, min(samples) - 1e-10)
+	}
 
 	# We use a grid of initial values, and take the best of them
 	#for(alpha in c(0.1, 0.2, 0.4, 0.6, 0.8, 0.9))
@@ -108,12 +118,19 @@ kwcwg.infer = function(samples, useHeuristic=FALSE){
 	for(a in c(2, 10))
 	for(b in c(0.1, 10)){
 		params = c(alpha, beta, gamma, a, b)
+		if(useC)
+			params = c(params, estimatedC)
 		# print(params)
 		
 		# cat("Optimizing with initial params:", params, "\n")
 		if(useHeuristic == FALSE){
-			result = optim(params, likelihood, method="BFGS")
-			result = optim(result$par, likelihood, method="BFGS")
+			if(useC == FALSE){
+				result = optim(params, function(p) likelihood(p), lower=lower, upper=upper, method="BFGS")
+				result = optim(result$par, function(p) likelihood(p), lower=lower, upper=upper, method="BFGS")
+			} else {
+				result = optim(params, function(p) likelihood(p, p[length(p)]), lower=lower, upper=upper, method="BFGS")
+				result = optim(result$par, function(p) likelihood(p, p[length(p)]), lower=lower, upper=upper, method="BFGS")
+			}
 		} else {
 			result = GenSA(params, likelihood, lower=lower, upper=upper)
 		}
@@ -126,7 +143,11 @@ kwcwg.infer = function(samples, useHeuristic=FALSE){
 	}
 
 	retval = as.data.frame(retval)
-	colnames(retval) = c("alpha", "beta", "gamma", "a", "b", "value")
+	if(useC == FALSE){
+		colnames(retval) = c("alpha", "beta", "gamma", "a", "b", "value")
+	} else {
+		colnames(retval) = c("alpha", "beta", "gamma", "a", "b", "c", "value")
+	}
 
 	# We sort it by value
 	sortedIdx = sort.list(retval$value, decreasing=TRUE)
@@ -135,7 +156,7 @@ kwcwg.infer = function(samples, useHeuristic=FALSE){
 	return(retval)
 }
 
-kwcwg.lines = function(samples, params, ...){
+kwcwg.lines = function(samples, params, useC=FALSE, ...){
 	delta = diff(quantile(samples, c(0.05, 0.95)))
 	minVal = min(samples) - 0.95*delta;
 	maxVal = max(samples) + 1.05*delta;
@@ -143,7 +164,16 @@ kwcwg.lines = function(samples, params, ...){
 	if(minVal <= 0)
 		minVal = 1e-100
 
+	if(useC){
+		minVal = minVal - params[length(params)]
+		maxVal = maxVal - params[length(params)]
+	}
+
 	x = seq(minVal, maxVal, length=1000)
 	y = dkwcwg(x, params[1], params[2], params[3], params[4], params[5])
+	
+	if(useC)
+		x = x + params[length(params)]
+
 	lines(x, y, ...)
 }
