@@ -1,7 +1,5 @@
 require(GenSA)
 
-# @param useHeuristic Tells us to use genetic algorithm as optimization function.
-# @param useC Tells us to also estimate parameter C, which is the amount to subtract from the samples.
 weibull.infer = function(samples, useHeuristic=FALSE){
 	isZero = which(samples == 0)
 	samples[isZero] = min(samples[-isZero])
@@ -9,12 +7,9 @@ weibull.infer = function(samples, useHeuristic=FALSE){
 	# This quantile is apparently a good estimator for the beta parameter
 	estimatedBeta = quantile(samples, p=.632)
 
-	# This will be shared between likelihood.base and likelihood.c
-	ourSamples = samples
-
 	# The likelihood function
 	likelihood = function(params){
-		allLogs = dweibull(ourSamples, shape=params[1], scale=params[2], log=TRUE)
+		allLogs = dweibull(samples, shape=params[1], scale=params[2], log=TRUE)
 
 		problems = which(!is.finite(allLogs))
 		if(length(problems) > 0 && length(problems) <= 5){
@@ -24,7 +19,7 @@ weibull.infer = function(samples, useHeuristic=FALSE){
 		}
 
 		if(length(problems) > 0 && length(problems) < 5){
-			warning(paste("weibull: Low amount (<5) of warnings at points:", ourSamples[problems]), call.=FALSE)
+			warning(paste("weibull: Low amount (<5) of warnings at points:", samples[problems]), call.=FALSE)
 		}
 
 		theSum = -sum(allLogs)

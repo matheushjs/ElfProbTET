@@ -1,20 +1,15 @@
 require(rmutil)
 require(GenSA)
 
-# @param useHeuristic Tells us to use genetic algorithm as optimization function.
-# @param useC Tells us to also estimate parameter C, which is the amount to subtract from the samples.
-expweibull.infer = function(samples, useHeuristic=FALSE, useC=FALSE){
+expweibull.infer = function(samples, useHeuristic=FALSE){
 	# dgweibull does not accept a sample of value 0, so we fix this here
 	isZero = which(samples == 0)
 	samples[isZero] = min(samples[-isZero])
 
-	# This will be shared between likelihood.base and likelihood.c
-	ourSamples = samples
-
 	# The likelihood function
 	likelihood = function(params){
 		# shape s > 0, scale m > 0, family f > 0
-		allLogs = dgweibull(ourSamples, s=params[1], m=params[2], f=params[3], log=TRUE)
+		allLogs = dgweibull(samples, s=params[1], m=params[2], f=params[3], log=TRUE)
 
 		problems = which(!is.finite(allLogs))
 		if(length(problems) > 0 && length(problems) <= 5){
@@ -24,7 +19,7 @@ expweibull.infer = function(samples, useHeuristic=FALSE, useC=FALSE){
 		}
 
 		if(length(problems) > 0 && length(problems) < 5){
-			warning(paste("expweibul: Low amount (<5) of warnings at points:", ourSamples[problems]), call.=FALSE)
+			warning(paste("expweibul: Low amount (<5) of warnings at points:", samples[problems]), call.=FALSE)
 		}
 
 		theSum = -sum(allLogs)

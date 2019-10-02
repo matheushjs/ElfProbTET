@@ -1,19 +1,14 @@
 require(flexsurv)
 require(GenSA)
 
-# @param useHeuristic Tells us to use genetic algorithm as optimization function.
-# @param useC Tells us to also estimate parameter C, which is the amount to subtract from the samples.
 gengamma.infer = function(samples, useHeuristic=FALSE){
 	isZero = which(samples == 0)
 	samples[isZero] = min(samples[-isZero])
 
-	# This will be shared between likelihood.base and likelihood.c
-	ourSamples = samples
-
 	# The likelihood function
 	likelihood = function(params){
 		# shape > 0, scale > 0, k > 0
-		allLogs = dgengamma.orig(ourSamples, shape=params[1], scale=params[2], k=params[3], log=TRUE)
+		allLogs = dgengamma.orig(samples, shape=params[1], scale=params[2], k=params[3], log=TRUE)
 
 		problems = which(!is.finite(allLogs))
 		if(length(problems) > 0 && length(problems) <= 5){
@@ -23,7 +18,7 @@ gengamma.infer = function(samples, useHeuristic=FALSE){
 		}
 
 		if(length(problems) > 0 && length(problems) < 5){
-			warning(paste("gengamma: Low amount (<5) of warnings at points:", ourSamples[problems]), call.=FALSE)
+			warning(paste("gengamma: Low amount (<5) of warnings at points:", samples[problems]), call.=FALSE)
 		}
 
 		theSum = -sum(allLogs)
