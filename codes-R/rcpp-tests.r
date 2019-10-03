@@ -24,10 +24,22 @@ Rcpp::cppFunction('
 			num = F;
 		}
 		return v;
-	}')
+	}', verbose=T)
 
-x = 1:1e6
-result = microbenchmark::microbenchmark(f(x), g(x), unit="ms")
+h = function(x){
+	for(i in 1:length(x)){
+		A = x[i]**2
+		B = exp(A)
+		C = sqrt(B)
+		D = log(C)
+		E = D**10
+		x[i] = log2(E)
+	}
+	return(x);
+}
+
+x = 1:1e5
+result = microbenchmark::microbenchmark(f(x), g(x), h(x), unit="ms")
 
 
 print(result)
