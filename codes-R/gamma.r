@@ -32,7 +32,7 @@ gamma.infer = function(samples, useHeuristic=FALSE, useC=FALSE){
 
 	retval = NULL
 
-	if(useC){
+	if(useC == FALSE){
 		lower = c(1e-10, 1e-10)
 		upper = c(Inf, Inf)
 	} else {
