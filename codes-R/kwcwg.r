@@ -91,7 +91,7 @@ kwcwg.infer = function(samples, useHeuristic=FALSE, useC=FALSE){
 			warning(paste("kwcwg: Low amount (<5) of warnings at points:", ourSamples[problems]), call.=FALSE)
 		}
 
-		theSum = -sum(allLogs)
+		theSum = -sum(allLogs) # Invert so that minimization yields a maximum
 		
 		return(theSum)
 	}
@@ -136,7 +136,7 @@ kwcwg.infer = function(samples, useHeuristic=FALSE, useC=FALSE){
 		}
 
 		params = result$par
-		val = result$value
+		val = -result$value # Undo signal invertion in the likelihood function
 		# cat("Got params:", params, "\n")
 
 		retval = rbind(retval, c(params, val))
@@ -150,7 +150,7 @@ kwcwg.infer = function(samples, useHeuristic=FALSE, useC=FALSE){
 	}
 
 	# We sort it by value
-	sortedIdx = sort.list(retval$value, decreasing=TRUE)
+	sortedIdx = sort.list(retval$value, decreasing=FALSE)
 	retval = retval[sortedIdx,]
 
 	return(retval)
