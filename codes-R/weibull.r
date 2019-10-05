@@ -5,15 +5,16 @@ require(GenSA)
 weibull.infer = function(samples, useHeuristic=FALSE, useC=FALSE){
 	estimatedC    = min(samples) * 0.995
 
-	isZero = which(samples == 0)
-	samples[isZero] = min(samples[-isZero])
-
 	# This quantile is apparently a good estimator for the beta parameter
 	estimatedBeta = quantile(samples, p=.632)
 
 	# The likelihood function
 	likelihood = function(params, C=0){
 		ourSamples = samples - C
+
+		isZero = which(ourSamples == 0)
+		if(sum(isZero) > 0)
+			ourSamples[isZero] = min(ourSamples[-isZero])
 
 		allLogs = dweibull(ourSamples, shape=params[1], scale=params[2], log=TRUE)
 

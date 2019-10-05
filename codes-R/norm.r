@@ -5,12 +5,13 @@ require(GenSA)
 norm.infer = function(samples, useHeuristic=FALSE, useC=FALSE){
 	estimatedC    = min(samples) * 0.995
 
-	isZero = which(samples == 0)
-	samples[isZero] = min(samples[-isZero])
-
 	# The likelihood function
 	likelihood = function(params, C=0){
 		ourSamples = samples - C
+
+		isZero = which(ourSamples == 0)
+		if(sum(isZero) > 0)
+			ourSamples[isZero] = min(ourSamples[-isZero])
 
 		allLogs = dnorm(ourSamples, mean=params[1], sd=params[2], log=TRUE)
 

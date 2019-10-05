@@ -71,12 +71,13 @@ kwcwg.infer = function(samples, useHeuristic=FALSE, useC=FALSE){
 	estimatedBeta = quantile(samples, p=.632)
 	estimatedC    = min(samples) * 0.995
 
-	isZero = which(samples == 0)
-	samples[isZero] = min(samples[-isZero])
-
 	# The likelihood function
 	likelihood = function(params, C=0){
 		ourSamples = samples - C;
+
+		isZero = which(ourSamples == 0)
+		if(sum(isZero) > 0)
+			ourSamples[isZero] = min(ourSamples[-isZero])
 
 		allLogs = dkwcwg(ourSamples, params[1], params[2], params[3], params[4], params[5], log=T)
 

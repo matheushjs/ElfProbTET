@@ -6,13 +6,15 @@ require(GenSA)
 expweibull.infer = function(samples, useHeuristic=FALSE, useC=FALSE){
 	estimatedC    = min(samples) * 0.995
 
-	# dgweibull does not accept a sample of value 0, so we fix this here
-	isZero = which(samples == 0)
-	samples[isZero] = min(samples[-isZero])
-
 	# The likelihood function
 	likelihood = function(params, C=0){
 		ourSamples = samples - C;
+
+		# dgweibull does not accept a sample of value 0, so we fix this here
+		isZero = which(ourSamples == 0)
+		if(sum(isZero) > 0)
+			ourSamples[isZero] = min(ourSamples[-isZero])
+
 		# shape s > 0, scale m > 0, family f > 0
 		allLogs = dgweibull(ourSamples, s=params[1], m=params[2], f=params[3], log=TRUE)
 
