@@ -96,8 +96,6 @@ gamma.infer = function(samples, useHeuristic=FALSE, useC=FALSE){
 	sortedIdx = sort.list(retval$value, decreasing=FALSE)
 	retval = retval[sortedIdx,]
 
-	print(retval)
-
 	return(retval)
 }
 

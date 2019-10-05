@@ -86,6 +86,7 @@ generate.plots = function(fullDataset, zeroPositioning=FALSE, useHeuristic=FALSE
 		for(j in 1:length(dataset$psizes)){
 			psize = dataset$psizes[j]
 			samples = dataset$samples[,j]
+			sampleSize = length(samples)
 			df = data.frame()
 			histMinX = NULL
 
@@ -101,41 +102,71 @@ generate.plots = function(fullDataset, zeroPositioning=FALSE, useHeuristic=FALSE
 			elapsed = system.time({ retval = gamma.infer(samples, useHeuristic, useC) })["elapsed"]
 			retval = retval[nrow(retval),]
 			params = as.numeric(retval[1:(length(retval)-2)])
+			nParams = length(params)
 			errors = retval["convergence"] != 0
 			errorRatio = sum(errors) / length(errors)
+			minus2l = -2*retval["value"]
 			gamma.lines(samples, params, useC, lty=2, col=2, lwd=3)
-			df = rbind(df, c(title, "Gamma", paste.vector(params), paste(-2*retval["value"]), paste(elapsed), paste(errorRatio)), stringsAsFactors=FALSE)
-			colnames(df) = c("title", "model", "estimates", "-2l", "elapsed.time", "optErrorRatio")
+			df = rbind(df, c(title, "Gamma", paste.vector(params), 
+							 paste(minus2l), paste(minus2l + 2*nParams), paste(minus2l + 2*nParams*sampleSize/(sampleSize - nParams - 1)),
+							 paste(minus2l + 2*nParams*log(log(sampleSize))), paste(minus2l + nParams*log(sampleSize)), paste(elapsed), paste(errorRatio)),
+					   stringsAsFactors=FALSE)
+			colnames(df) = c("title", "model", "estimates", "-2l", "AIC", "CAIC", "BIC", "HQIC", "elapsed.time", "optErrorRatio")
 
 			elapsed = system.time({ retval = weibull.infer(samples, useHeuristic, useC) })["elapsed"]
 			retval = retval[nrow(retval),]
 			params = as.numeric(retval[1:(length(retval)-2)])
+			nParams = length(params)
+			minus2l = -2*retval["value"]
 			weibull.lines(samples, params, useC, lty=3, col=3, lwd=3)
-			df = rbind(df, c(title, "Weibull", paste.vector(params), paste(-2*retval["value"]), paste(elapsed), paste(errorRatio)), stringsAsFactors=FALSE)
+			df = rbind(df, c(title, "Weibull", paste.vector(params),
+							 paste(minus2l), paste(minus2l + 2*nParams), paste(minus2l + 2*nParams*sampleSize/(sampleSize - nParams - 1)),
+							 paste(minus2l + 2*nParams*log(log(sampleSize))), paste(minus2l + nParams*log(sampleSize)), paste(elapsed), paste(errorRatio)),
+					   stringsAsFactors=FALSE)
 
 			elapsed = system.time({ retval = norm.infer(samples, useHeuristic, useC) })["elapsed"]
 			retval = retval[nrow(retval),]
 			params = as.numeric(retval[1:(length(retval)-2)])
+			nParams = length(params)
+			minus2l = -2*retval["value"]
 			norm.lines(samples, params, useC, lty=4, col=4, lwd=3)
-			df = rbind(df, c(title, "Normal", paste.vector(params), paste(-2*retval["value"]), paste(elapsed), paste(errorRatio)), stringsAsFactors=FALSE)
+			df = rbind(df, c(title, "Normal", paste.vector(params),
+							 paste(minus2l), paste(minus2l + 2*nParams), paste(minus2l + 2*nParams*sampleSize/(sampleSize - nParams - 1)),
+							 paste(minus2l + 2*nParams*log(log(sampleSize))), paste(minus2l + nParams*log(sampleSize)), paste(elapsed), paste(errorRatio)),
+					   stringsAsFactors=FALSE)
 
 			elapsed = system.time({ retval = kwcwg.infer(samples, useHeuristic, useC) })["elapsed"]
 			retval = retval[nrow(retval),]
 			params = as.numeric(retval[1:(length(retval)-2)])
+			nParams = length(params)
+			minus2l = -2*retval["value"]
 			kwcwg.lines(samples, params, useC, lty=1, col=1, lwd=3)
-			df = rbind(df, c(title, "KW-CWG", paste.vector(params), paste(-2*retval["value"]), paste(elapsed), paste(errorRatio)), stringsAsFactors=FALSE)
+			df = rbind(df, c(title, "KW-CWG", paste.vector(params),
+							 paste(minus2l), paste(minus2l + 2*nParams), paste(minus2l + 2*nParams*sampleSize/(sampleSize - nParams - 1)),
+							 paste(minus2l + 2*nParams*log(log(sampleSize))), paste(minus2l + nParams*log(sampleSize)), paste(elapsed), paste(errorRatio)),
+					   stringsAsFactors=FALSE)
 
 			elapsed = system.time({ retval = gengamma.infer(samples, useHeuristic, useC) })["elapsed"]
 			retval = retval[nrow(retval),]
 			params = as.numeric(retval[1:(length(retval)-2)])
+			nParams = length(params)
+			minus2l = -2*retval["value"]
 			gengamma.lines(samples, params, useC, lty=5, col=5, lwd=3)
-			df = rbind(df, c(title, "G.Gamma", paste.vector(params), paste(-2*retval["value"]), paste(elapsed), paste(errorRatio)), stringsAsFactors=FALSE)
+			df = rbind(df, c(title, "G.Gamma", paste.vector(params),
+							 paste(minus2l), paste(minus2l + 2*nParams), paste(minus2l + 2*nParams*sampleSize/(sampleSize - nParams - 1)),
+							 paste(minus2l + 2*nParams*log(log(sampleSize))), paste(minus2l + nParams*log(sampleSize)), paste(elapsed), paste(errorRatio)),
+					   stringsAsFactors=FALSE)
 
 			elapsed = system.time({ retval = expweibull.infer(samples, useHeuristic, useC) })["elapsed"]
 			retval = retval[nrow(retval),]
 			params = as.numeric(retval[1:(length(retval)-2)])
+			nParams = length(params)
+			minus2l = -2*retval["value"]
 			expweibull.lines(samples, params, useC, lty=6, col=6, lwd=3)
-			df = rbind(df, c(title, "E.Weibull", paste.vector(params), paste(-2*retval["value"]), paste(elapsed), paste(errorRatio)), stringsAsFactors=FALSE)
+			df = rbind(df, c(title, "E.Weibull", paste.vector(params),
+							 paste(minus2l), paste(minus2l + 2*nParams), paste(minus2l + 2*nParams*sampleSize/(sampleSize - nParams - 1)),
+							 paste(minus2l + 2*nParams*log(log(sampleSize))), paste(minus2l + nParams*log(sampleSize)), paste(elapsed), paste(errorRatio)),
+					   stringsAsFactors=FALSE)
 
 			print(df, width=150)
 			write.csv(df, file=paste(dataset$fileroot, "-", psize, ".csv", sep=""))
