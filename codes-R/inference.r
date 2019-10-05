@@ -100,7 +100,7 @@ generate.plots = function(fullDataset, zeroPositioning=FALSE, useHeuristic=FALSE
 
 			elapsed = system.time({ retval = gamma.infer(samples, useHeuristic, useC) })["elapsed"]
 			retval = retval[nrow(retval),]
-			params = as.numeric(retval[1:length(retval)-1])
+			params = as.numeric(retval[1:(length(retval)-2)])
 			errors = retval["convergence"] != 0
 			errorRatio = sum(errors) / length(errors)
 			gamma.lines(samples, params, useC, lty=2, col=2, lwd=3)
@@ -109,31 +109,31 @@ generate.plots = function(fullDataset, zeroPositioning=FALSE, useHeuristic=FALSE
 
 			elapsed = system.time({ retval = weibull.infer(samples, useHeuristic, useC) })["elapsed"]
 			retval = retval[nrow(retval),]
-			params = as.numeric(retval[1:length(retval)-1])
+			params = as.numeric(retval[1:(length(retval)-2)])
 			weibull.lines(samples, params, useC, lty=3, col=3, lwd=3)
 			df = rbind(df, c(title, "Weibull", paste.vector(params), paste(-2*retval["value"]), paste(elapsed), paste(errorRatio)), stringsAsFactors=FALSE)
 
 			elapsed = system.time({ retval = norm.infer(samples, useHeuristic, useC) })["elapsed"]
 			retval = retval[nrow(retval),]
-			params = as.numeric(retval[1:length(retval)-1])
+			params = as.numeric(retval[1:(length(retval)-2)])
 			norm.lines(samples, params, useC, lty=4, col=4, lwd=3)
 			df = rbind(df, c(title, "Normal", paste.vector(params), paste(-2*retval["value"]), paste(elapsed), paste(errorRatio)), stringsAsFactors=FALSE)
 
 			elapsed = system.time({ retval = kwcwg.infer(samples, useHeuristic, useC) })["elapsed"]
 			retval = retval[nrow(retval),]
-			params = as.numeric(retval[1:length(retval)-1])
+			params = as.numeric(retval[1:(length(retval)-2)])
 			kwcwg.lines(samples, params, useC, lty=1, col=1, lwd=3)
 			df = rbind(df, c(title, "KW-CWG", paste.vector(params), paste(-2*retval["value"]), paste(elapsed), paste(errorRatio)), stringsAsFactors=FALSE)
 
 			elapsed = system.time({ retval = gengamma.infer(samples, useHeuristic, useC) })["elapsed"]
 			retval = retval[nrow(retval),]
-			params = as.numeric(retval[1:length(retval)-1])
+			params = as.numeric(retval[1:(length(retval)-2)])
 			gengamma.lines(samples, params, useC, lty=5, col=5, lwd=3)
 			df = rbind(df, c(title, "G.Gamma", paste.vector(params), paste(-2*retval["value"]), paste(elapsed), paste(errorRatio)), stringsAsFactors=FALSE)
 
 			elapsed = system.time({ retval = expweibull.infer(samples, useHeuristic, useC) })["elapsed"]
 			retval = retval[nrow(retval),]
-			params = as.numeric(retval[1:length(retval)-1])
+			params = as.numeric(retval[1:(length(retval)-2)])
 			expweibull.lines(samples, params, useC, lty=6, col=6, lwd=3)
 			df = rbind(df, c(title, "E.Weibull", paste.vector(params), paste(-2*retval["value"]), paste(elapsed), paste(errorRatio)), stringsAsFactors=FALSE)
 
