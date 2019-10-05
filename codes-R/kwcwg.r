@@ -88,7 +88,7 @@ kwcwg.infer = function(samples, useHeuristic=FALSE, useC=FALSE){
 		}
 
 		if(length(problems) > 0 && length(problems) < 5){
-			warning(paste("kwcwg: Low amount (<5) of warnings at points:", ourSamples[problems]), call.=FALSE)
+			warning("kwcwg(", params, "): Low amount (<5) of warnings at points: ", ourSamples[problems], call.=FALSE)
 		}
 
 		theSum = -sum(allLogs) # Invert so that minimization yields a maximum
