@@ -66,11 +66,11 @@ gamma.infer = function(samples, useHeuristic=FALSE, useC=FALSE){
 			#cat("Optimizing with initial params:", params, "\n")
 			if(useHeuristic == FALSE){
 				if(useC == FALSE){
-					result = optim(params, function(p) likelihood(p), lower=lower, upper=upper, method="BFGS")
-					result = optim(result$par, function(p) likelihood(p), lower=lower, upper=upper, method="BFGS")
+					result = optim(params, function(p) likelihood(p), lower=lower, upper=upper, method="L-BFGS-B")
+					result = optim(result$par, function(p) likelihood(p), lower=lower, upper=upper, method="L-BFGS-B")
 				} else {
-					result = optim(params, function(p) likelihood(p, p[length(p)]), lower=lower, upper=upper, method="BFGS")
-					result = optim(result$par, function(p) likelihood(p, p[length(p)]), lower=lower, upper=upper, method="BFGS")
+					result = optim(params, function(p) likelihood(p, p[length(p)]), lower=lower, upper=upper, method="L-BFGS-B")
+					result = optim(result$par, function(p) likelihood(p, p[length(p)]), lower=lower, upper=upper, method="L-BFGS-B")
 				}
 			} else {
 				result = GenSA(params, likelihood, lower=lower, upper=upper)
@@ -95,6 +95,8 @@ gamma.infer = function(samples, useHeuristic=FALSE, useC=FALSE){
 	# We sort it by value
 	sortedIdx = sort.list(retval$value, decreasing=FALSE)
 	retval = retval[sortedIdx,]
+
+	print(retval)
 
 	return(retval)
 }
