@@ -137,16 +137,17 @@ kwcwg.infer = function(samples, useHeuristic=FALSE, useC=FALSE){
 
 		params = result$par
 		val = -result$value # Undo signal invertion in the likelihood function
+		convergence = result$convergence
 		# cat("Got params:", params, "\n")
 
-		retval = rbind(retval, c(params, val))
+		retval = rbind(retval, c(params, val, convergence))
 	}
 
 	retval = as.data.frame(retval)
 	if(useC == FALSE){
-		colnames(retval) = c("alpha", "beta", "gamma", "a", "b", "value")
+		colnames(retval) = c("alpha", "beta", "gamma", "a", "b", "value", "convergence")
 	} else {
-		colnames(retval) = c("alpha", "beta", "gamma", "a", "b", "c", "value")
+		colnames(retval) = c("alpha", "beta", "gamma", "a", "b", "c", "value", "convergence")
 	}
 
 	# We sort it by value

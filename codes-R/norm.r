@@ -65,16 +65,17 @@ norm.infer = function(samples, useHeuristic=FALSE, useC=FALSE){
 
 		params = result$par
 		val = -result$value # Undo signal invertion in the likelihood function
+		convergence = result$convergence
 		# cat("Got params:", params, "\n")
 
-		retval = rbind(retval, c(params, val))
+		retval = rbind(retval, c(params, val, convergence))
 	}
 
 	retval = as.data.frame(retval)
 	if(useC == FALSE){
-		colnames(retval) = c("mean", "stdDev", "value")
+		colnames(retval) = c("mean", "stdDev", "value", "convergence")
 	} else {
-		colnames(retval) = c("mean", "stdDev", "c", "value")
+		colnames(retval) = c("mean", "stdDev", "c", "value", "convergence")
 	}
 
 	# We sort it by value

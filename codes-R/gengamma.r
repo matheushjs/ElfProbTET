@@ -65,16 +65,17 @@ gengamma.infer = function(samples, useHeuristic=FALSE, useC=FALSE){
 
 		params = result$par
 		val = -result$value # Undo signal invertion in the likelihood function
+		convergence = result$convergence
 		# cat("Got params:", params, "\n")
 
-		retval = rbind(retval, c(params, val))
+		retval = rbind(retval, c(params, val, convergence))
 	}
 
 	retval = as.data.frame(retval)
 	if(useC == FALSE){
-		colnames(retval) = c("shape", "scale", "k", "value")
+		colnames(retval) = c("shape", "scale", "k", "value", "convergence")
 	} else {
-		colnames(retval) = c("shape", "scale", "k", "c", "value")
+		colnames(retval) = c("shape", "scale", "k", "c", "value", "convergence")
 	}
 
 	# We sort it by value
