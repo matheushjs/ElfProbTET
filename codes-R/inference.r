@@ -130,7 +130,7 @@ generate.plots = function(fullDataset, zeroPositioning=FALSE, useHeuristic=FALSE
 			nParams = length(params)
 			minus2l = -2*retval["value"]
 			norm.lines(samples, params, useC, lty=4, col=4, lwd=3)
-			df = rbind(df, c(title, "Normal", paste.vector(params),
+			df = rbind(df, c(title, "T.Normal", paste.vector(params),
 							 paste(minus2l), paste(minus2l + 2*nParams), paste(minus2l + 2*nParams*sampleSize/(sampleSize - nParams - 1)),
 							 paste(minus2l + 2*nParams*log(log(sampleSize))), paste(minus2l + nParams*log(sampleSize)), paste(elapsed), paste(errorRatio)),
 					   stringsAsFactors=FALSE)
