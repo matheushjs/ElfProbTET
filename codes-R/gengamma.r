@@ -1,6 +1,8 @@
 require(flexsurv)
 require(GenSA)
 
+source("myoptim.r")
+
 # @param useHeuristic Tells us to use genetic algorithm as optimization function.
 # @param useC Tells us to also estimate parameter C, which is the amount to subtract from the samples.
 gengamma.infer = function(samples, useHeuristic=FALSE, useC=FALSE){
@@ -36,11 +38,11 @@ gengamma.infer = function(samples, useHeuristic=FALSE, useC=FALSE){
 	retval = NULL
 
 	if(useC == FALSE){
-		lower = c(1e-10, 1e-10, 1e-10)
+		lower = c(1e-7, 1e-7, 1e-7)
 		upper = c(Inf, Inf, Inf)
 	} else {
-		lower = c(1e-10, 1e-10, 1e-10, 1e-10)
-		upper = c(Inf, Inf, Inf, min(samples) - 1e-10)
+		lower = c(1e-7, 1e-7, 1e-7, 1e-7)
+		upper = c(Inf, Inf, Inf, min(samples) - 1e-7)
 	}
 
 	for(shape in c(0.5, 2, 5, 10))
@@ -54,11 +56,11 @@ gengamma.infer = function(samples, useHeuristic=FALSE, useC=FALSE){
 		# cat("Optimizing with initial params:", params, "\n")
 		if(useHeuristic == FALSE){
 			if(useC == FALSE){
-				result = optim(params, function(p) likelihood(p), lower=lower, upper=upper, method="L-BFGS-B")
-				result = optim(result$par, function(p) likelihood(p), lower=lower, upper=upper, method="L-BFGS-B")
+				result = myoptim(params, function(p) likelihood(p), lower=lower, upper=upper, method="L-BFGS-B")
+				result = myoptim(result$par, function(p) likelihood(p), lower=lower, upper=upper, method="L-BFGS-B")
 			} else {
-				result = optim(params, function(p) likelihood(p, p[length(p)]), lower=lower, upper=upper, method="L-BFGS-B")
-				result = optim(result$par, function(p) likelihood(p, p[length(p)]), lower=lower, upper=upper, method="L-BFGS-B")
+				result = myoptim(params, function(p) likelihood(p, p[length(p)]), lower=lower, upper=upper, method="L-BFGS-B")
+				result = myoptim(result$par, function(p) likelihood(p, p[length(p)]), lower=lower, upper=upper, method="L-BFGS-B")
 			}
 		} else {
 			result = GenSA(params, likelihood, lower=lower, upper=upper)

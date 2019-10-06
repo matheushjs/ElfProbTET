@@ -1,5 +1,7 @@
 require(GenSA)
 
+source("myoptim.r")
+
 # @param useHeuristic Tells us to use genetic algorithm as optimization function.
 # @param useC Tells us to also estimate parameter C, which is the amount to subtract from the samples.
 gamma.infer = function(samples, useHeuristic=FALSE, useC=FALSE){
@@ -67,11 +69,11 @@ gamma.infer = function(samples, useHeuristic=FALSE, useC=FALSE){
 			#cat("Optimizing with initial params:", params, "\n")
 			if(useHeuristic == FALSE){
 				if(useC == FALSE){
-					result = optim(params, function(p) likelihood(p), lower=lower, upper=upper, method="L-BFGS-B")
-					result = optim(result$par, function(p) likelihood(p), lower=lower, upper=upper, method="L-BFGS-B")
+					result = myoptim(params, function(p) likelihood(p), lower=lower, upper=upper, method="L-BFGS-B")
+					result = myoptim(result$par, function(p) likelihood(p), lower=lower, upper=upper, method="L-BFGS-B")
 				} else {
-					result = optim(params, function(p) likelihood(p, p[length(p)]), lower=lower, upper=upper, method="L-BFGS-B")
-					result = optim(result$par, function(p) likelihood(p, p[length(p)]), lower=lower, upper=upper, method="L-BFGS-B")
+					result = myoptim(params, function(p) likelihood(p, p[length(p)]), lower=lower, upper=upper, method="L-BFGS-B")
+					result = myoptim(result$par, function(p) likelihood(p, p[length(p)]), lower=lower, upper=upper, method="L-BFGS-B")
 				}
 			} else {
 				result = GenSA(params, likelihood, lower=lower, upper=upper)
