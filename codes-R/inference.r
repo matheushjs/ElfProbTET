@@ -106,7 +106,7 @@ generate.plots = function(fullDataset, zeroPositioning=FALSE, useHeuristic=FALSE
 			errors = retval["convergence"] != 0
 			errorRatio = sum(errors) / length(errors)
 			minus2l = -2*retval["value"]
-			gamma.lines(samples, params, useC, lty=2, col=2, lwd=3)
+			gamma.lines(samples, params, useC, lty=1, col=1, lwd=3)
 			df = rbind(df, c(title, "Gamma", paste.vector(params), 
 							 paste(minus2l), paste(minus2l + 2*nParams), paste(minus2l + 2*nParams*sampleSize/(sampleSize - nParams - 1)),
 							 paste(minus2l + 2*nParams*log(log(sampleSize))), paste(minus2l + nParams*log(sampleSize)), paste(elapsed), paste(errorRatio)),
@@ -118,7 +118,7 @@ generate.plots = function(fullDataset, zeroPositioning=FALSE, useHeuristic=FALSE
 			params = as.numeric(retval[1:(length(retval)-2)])
 			nParams = length(params)
 			minus2l = -2*retval["value"]
-			weibull.lines(samples, params, useC, lty=3, col=3, lwd=3)
+			weibull.lines(samples, params, useC, lty=2, col=2, lwd=3)
 			df = rbind(df, c(title, "Weibull", paste.vector(params),
 							 paste(minus2l), paste(minus2l + 2*nParams), paste(minus2l + 2*nParams*sampleSize/(sampleSize - nParams - 1)),
 							 paste(minus2l + 2*nParams*log(log(sampleSize))), paste(minus2l + nParams*log(sampleSize)), paste(elapsed), paste(errorRatio)),
@@ -129,7 +129,7 @@ generate.plots = function(fullDataset, zeroPositioning=FALSE, useHeuristic=FALSE
 			params = as.numeric(retval[1:(length(retval)-2)])
 			nParams = length(params)
 			minus2l = -2*retval["value"]
-			norm.lines(samples, params, useC, lty=4, col=4, lwd=3)
+			norm.lines(samples, params, useC, lty=3, col=3, lwd=3)
 			df = rbind(df, c(title, "T.Normal", paste.vector(params),
 							 paste(minus2l), paste(minus2l + 2*nParams), paste(minus2l + 2*nParams*sampleSize/(sampleSize - nParams - 1)),
 							 paste(minus2l + 2*nParams*log(log(sampleSize))), paste(minus2l + nParams*log(sampleSize)), paste(elapsed), paste(errorRatio)),
@@ -140,7 +140,7 @@ generate.plots = function(fullDataset, zeroPositioning=FALSE, useHeuristic=FALSE
 			params = as.numeric(retval[1:(length(retval)-2)])
 			nParams = length(params)
 			minus2l = -2*retval["value"]
-			kwcwg.lines(samples, params, useC, lty=1, col=1, lwd=3)
+			kwcwg.lines(samples, params, useC, lty=4, col=4, lwd=3)
 			df = rbind(df, c(title, "KW-CWG", paste.vector(params),
 							 paste(minus2l), paste(minus2l + 2*nParams), paste(minus2l + 2*nParams*sampleSize/(sampleSize - nParams - 1)),
 							 paste(minus2l + 2*nParams*log(log(sampleSize))), paste(minus2l + nParams*log(sampleSize)), paste(elapsed), paste(errorRatio)),
