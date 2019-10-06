@@ -1,4 +1,5 @@
 require(GenSA)
+require(truncnorm)
 
 # @param useHeuristic Tells us to use genetic algorithm as optimization function.
 # @param useC Tells us to also estimate parameter C, which is the amount to subtract from the samples.
@@ -9,11 +10,7 @@ norm.infer = function(samples, useHeuristic=FALSE, useC=FALSE){
 	likelihood = function(params, C=0){
 		ourSamples = samples - C
 
-		isZero = which(ourSamples == 0)
-		if(sum(isZero) > 0)
-			ourSamples[isZero] = min(ourSamples[-isZero])
-
-		allLogs = dnorm(ourSamples, mean=params[1], sd=params[2], log=TRUE)
+		allLogs = log(dtruncnorm(ourSamples, a=0, mean=params[1], sd=params[2]))
 
 		problems = which(!is.finite(allLogs))
 		if(length(problems) > 0 && length(problems) <= 5){
@@ -100,7 +97,7 @@ norm.lines = function(samples, params, useC=FALSE, ...){
 	}
 
 	x = seq(minVal, maxVal, length=1000)
-	y = dnorm(x, mean=params[1], sd=params[2])
+	y = dtruncnorm(x, a=0, mean=params[1], sd=params[2])
 
 	if(useC)
 		x = x + params[length(params)]
