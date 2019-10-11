@@ -79,7 +79,7 @@ samples.hist = function(samples, breaks=20, main="", xmin=NULL){
 
 # Process all files and save all plots
 # If zeroPositioning is TRUE, we subtract the lowest execution time from the sample, making the empirical distribution begin at zero.
-generate.plots = function(fullDataset, zeroPositioning=FALSE, useHeuristic=FALSE, useC=FALSE){
+generate.plots = function(fullDataset, zeroPositioning=FALSE, useHeuristic=FALSE, useC=FALSE, useMinEstimator=FALSE){
 	for(i in 1:length(fullDataset)){
 		dataset = fullDataset[[i]]
 
@@ -91,7 +91,13 @@ generate.plots = function(fullDataset, zeroPositioning=FALSE, useHeuristic=FALSE
 			histMinX = NULL
 
 			if(zeroPositioning){
-				samples = samples - min(samples)
+				if(useMinEstimator){
+					factor = 1 - sd(samples)/(mean(samples) * log10(sampleSize))
+				} else {
+					factor = 1
+				}
+				samples = samples - factor*min(samples)
+				cat("factor: ", factor, "\n")
 				histMinX = 0
 			}
 
