@@ -103,7 +103,7 @@ expweibull.lines = function(samples, params, useC=FALSE, ...){
 	}
 
 	x = seq(minVal, maxVal, length=1000)
-	x[x == 0] = 1e-100
+	x[x <= 1e-10] = 1e-10
 	y = dgweibull(x, s=params[1], m=params[2], f=params[3])
 
 	if(useC)

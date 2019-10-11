@@ -30,8 +30,14 @@ norm.infer = function(samples, useHeuristic=FALSE, useC=FALSE){
 		return(theSum)
 	}
 
-	sampleMean = mean(samples)
-	sampleSd   = sd(samples)
+	if(useC == FALSE){
+		sampleMean = mean(samples)
+		sampleSd   = sd(samples)
+	} else {
+		ourSamples = samples - estimatedC
+		sampleMean = mean(ourSamples)
+		sampleSd   = sd(ourSamples)
+	}
 
 	retval = NULL
 
