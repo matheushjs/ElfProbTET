@@ -11,6 +11,10 @@ for dir in $allDirs; do
 	for i in $files; do
 		cat $i | tail +2 | sed -e "s/^/\"$dir\",/g";
 	done >> $ofile
+
+	ofile="$dir".pdf
+	files="$(ls $dir/*.png)"
+	magick $files $ofile
 done
 
 arr=($allDirs)
