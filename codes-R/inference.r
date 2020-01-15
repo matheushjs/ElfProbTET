@@ -1,8 +1,10 @@
+require(viridis)
 
 source("./kwcwg.r")
 source("./weibull.r")
 source("./gamma.r")
 source("./tnorm.r")
+source("./norm.r")
 source("./gengamma.r")
 source("./expweibull.r")
 
@@ -24,6 +26,22 @@ paste.vector = function(vec){
 		retval = paste(retval, item)
 	}
 	return(retval)
+}
+
+mycolors = c(
+	"#000000FF",
+	"#FF0000FF",
+	"#00FF00FF",
+	"#0000FFFF",
+	"#00FFFFFF",
+	"#FF00FFFF",
+	"#FFFF00FF",
+	"#999999FF"
+);
+
+getlwd = function(idx){
+	#return( 12 - 1.2*(idx-1) );
+	rep(3, length(idx));
 }
 
 # Already prepares all sample sets, with all information we might need
@@ -112,7 +130,7 @@ generate.plots = function(fullDataset, zeroPositioning=FALSE, useHeuristic=FALSE
 			errors = retval["convergence"] != 0
 			errorRatio = sum(errors) / length(errors)
 			minus2l = -2*retval["value"]
-			gamma.lines(samples, params, useC, lty=1, col=1, lwd=3)
+			gamma.lines(samples, params, useC, lty=1, col=mycolors[1], lwd=getlwd(1))
 			df = rbind(df, c(title, "Gamma", paste.vector(params), 
 							 paste(minus2l), paste(minus2l + 2*nParams), paste(minus2l + 2*nParams*sampleSize/(sampleSize - nParams - 1)),
 							 paste(minus2l + 2*nParams*log(log(sampleSize))), paste(minus2l + nParams*log(sampleSize)), paste(elapsed), paste(errorRatio)),
@@ -124,8 +142,19 @@ generate.plots = function(fullDataset, zeroPositioning=FALSE, useHeuristic=FALSE
 			params = as.numeric(retval[1:(length(retval)-2)])
 			nParams = length(params)
 			minus2l = -2*retval["value"]
-			weibull.lines(samples, params, useC, lty=2, col=2, lwd=3)
+			weibull.lines(samples, params, useC, lty=2, col=mycolors[2], lwd=getlwd(2))
 			df = rbind(df, c(title, "Weibull", paste.vector(params),
+							 paste(minus2l), paste(minus2l + 2*nParams), paste(minus2l + 2*nParams*sampleSize/(sampleSize - nParams - 1)),
+							 paste(minus2l + 2*nParams*log(log(sampleSize))), paste(minus2l + nParams*log(sampleSize)), paste(elapsed), paste(errorRatio)),
+					   stringsAsFactors=FALSE)
+
+			elapsed = system.time({ retval = norm.infer(samples, useHeuristic, useC) })["elapsed"]
+			retval = retval[nrow(retval),]
+			params = as.numeric(retval[1:(length(retval)-2)])
+			nParams = length(params)
+			minus2l = -2*retval["value"]
+			norm.lines(samples, params, useC, lty=3, col=mycolors[3], lwd=getlwd(3))
+			df = rbind(df, c(title, "Normal", paste.vector(params),
 							 paste(minus2l), paste(minus2l + 2*nParams), paste(minus2l + 2*nParams*sampleSize/(sampleSize - nParams - 1)),
 							 paste(minus2l + 2*nParams*log(log(sampleSize))), paste(minus2l + nParams*log(sampleSize)), paste(elapsed), paste(errorRatio)),
 					   stringsAsFactors=FALSE)
@@ -135,7 +164,7 @@ generate.plots = function(fullDataset, zeroPositioning=FALSE, useHeuristic=FALSE
 			params = as.numeric(retval[1:(length(retval)-2)])
 			nParams = length(params)
 			minus2l = -2*retval["value"]
-			tnorm.lines(samples, params, useC, lty=3, col=3, lwd=3)
+			tnorm.lines(samples, params, useC, lty=4, col=mycolors[4], lwd=getlwd(4))
 			df = rbind(df, c(title, "T.Normal", paste.vector(params),
 							 paste(minus2l), paste(minus2l + 2*nParams), paste(minus2l + 2*nParams*sampleSize/(sampleSize - nParams - 1)),
 							 paste(minus2l + 2*nParams*log(log(sampleSize))), paste(minus2l + nParams*log(sampleSize)), paste(elapsed), paste(errorRatio)),
@@ -146,7 +175,7 @@ generate.plots = function(fullDataset, zeroPositioning=FALSE, useHeuristic=FALSE
 			params = as.numeric(retval[1:(length(retval)-2)])
 			nParams = length(params)
 			minus2l = -2*retval["value"]
-			kwcwg.lines(samples, params, useC, lty=4, col=4, lwd=3)
+			kwcwg.lines(samples, params, useC, lty=5, col=mycolors[5], lwd=getlwd(5))
 			df = rbind(df, c(title, "KW-CWG", paste.vector(params),
 							 paste(minus2l), paste(minus2l + 2*nParams), paste(minus2l + 2*nParams*sampleSize/(sampleSize - nParams - 1)),
 							 paste(minus2l + 2*nParams*log(log(sampleSize))), paste(minus2l + nParams*log(sampleSize)), paste(elapsed), paste(errorRatio)),
@@ -157,7 +186,7 @@ generate.plots = function(fullDataset, zeroPositioning=FALSE, useHeuristic=FALSE
 			params = as.numeric(retval[1:(length(retval)-2)])
 			nParams = length(params)
 			minus2l = -2*retval["value"]
-			gengamma.lines(samples, params, useC, lty=5, col=5, lwd=3)
+			gengamma.lines(samples, params, useC, lty=6, col=mycolors[6], lwd=getlwd(6))
 			df = rbind(df, c(title, "G.Gamma", paste.vector(params),
 							 paste(minus2l), paste(minus2l + 2*nParams), paste(minus2l + 2*nParams*sampleSize/(sampleSize - nParams - 1)),
 							 paste(minus2l + 2*nParams*log(log(sampleSize))), paste(minus2l + nParams*log(sampleSize)), paste(elapsed), paste(errorRatio)),
@@ -168,7 +197,7 @@ generate.plots = function(fullDataset, zeroPositioning=FALSE, useHeuristic=FALSE
 			params = as.numeric(retval[1:(length(retval)-2)])
 			nParams = length(params)
 			minus2l = -2*retval["value"]
-			expweibull.lines(samples, params, useC, lty=6, col=6, lwd=3)
+			expweibull.lines(samples, params, useC, lty=7, col=mycolors[7], lwd=getlwd(7))
 			df = rbind(df, c(title, "E.Weibull", paste.vector(params),
 							 paste(minus2l), paste(minus2l + 2*nParams), paste(minus2l + 2*nParams*sampleSize/(sampleSize - nParams - 1)),
 							 paste(minus2l + 2*nParams*log(log(sampleSize))), paste(minus2l + nParams*log(sampleSize)), paste(elapsed), paste(errorRatio)),
@@ -177,7 +206,7 @@ generate.plots = function(fullDataset, zeroPositioning=FALSE, useHeuristic=FALSE
 			print(df, width=150)
 			write.csv(df, file=paste(dataset$fileroot, "-", psize, ".csv", sep=""))
 
-			legend("topright", unname(unlist(df["model"])), lty=1:nrow(df), col=1:nrow(df), lwd=3)
+			legend("topright", unname(unlist(df["model"])), lty=1:nrow(df), col=mycolors[1:nrow(df)], lwd=getlwd(1:nrow(df)))
 
 			outputName = paste(dataset$fileroot, "-", psize, ".png", sep="")
 			savePlot(outputName, type="png")
