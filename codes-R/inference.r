@@ -2,7 +2,7 @@
 source("./kwcwg.r")
 source("./weibull.r")
 source("./gamma.r")
-source("./norm.r")
+source("./tnorm.r")
 source("./gengamma.r")
 source("./expweibull.r")
 
@@ -130,12 +130,12 @@ generate.plots = function(fullDataset, zeroPositioning=FALSE, useHeuristic=FALSE
 							 paste(minus2l + 2*nParams*log(log(sampleSize))), paste(minus2l + nParams*log(sampleSize)), paste(elapsed), paste(errorRatio)),
 					   stringsAsFactors=FALSE)
 
-			elapsed = system.time({ retval = norm.infer(samples, useHeuristic, useC) })["elapsed"]
+			elapsed = system.time({ retval = tnorm.infer(samples, useHeuristic, useC) })["elapsed"]
 			retval = retval[nrow(retval),]
 			params = as.numeric(retval[1:(length(retval)-2)])
 			nParams = length(params)
 			minus2l = -2*retval["value"]
-			norm.lines(samples, params, useC, lty=3, col=3, lwd=3)
+			tnorm.lines(samples, params, useC, lty=3, col=3, lwd=3)
 			df = rbind(df, c(title, "T.Normal", paste.vector(params),
 							 paste(minus2l), paste(minus2l + 2*nParams), paste(minus2l + 2*nParams*sampleSize/(sampleSize - nParams - 1)),
 							 paste(minus2l + 2*nParams*log(log(sampleSize))), paste(minus2l + nParams*log(sampleSize)), paste(elapsed), paste(errorRatio)),

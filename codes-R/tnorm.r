@@ -5,7 +5,7 @@ source("myoptim.r")
 
 # @param useHeuristic Tells us to use genetic algorithm as optimization function.
 # @param useC Tells us to also estimate parameter C, which is the amount to subtract from the samples.
-norm.infer = function(samples, useHeuristic=FALSE, useC=FALSE){
+tnorm.infer = function(samples, useHeuristic=FALSE, useC=FALSE){
 	estimatedC    = min(samples) * 0.995
 
 	# The likelihood function
@@ -91,7 +91,7 @@ norm.infer = function(samples, useHeuristic=FALSE, useC=FALSE){
 	return(retval)
 }
 
-norm.lines = function(samples, params, useC=FALSE, ...){
+tnorm.lines = function(samples, params, useC=FALSE, ...){
 	delta = diff(quantile(samples, c(0.05, 0.95)))
 	minVal = min(samples) - 0.95*delta;
 	maxVal = max(samples) + 1.05*delta;
