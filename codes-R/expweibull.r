@@ -1,4 +1,4 @@
-require(rmutil)
+#require(rmutil)
 require(GenSA)
 
 source("myoptim.r")
@@ -18,7 +18,7 @@ expweibull.infer = function(samples, useHeuristic=FALSE, useC=FALSE){
 			ourSamples[isZero] = min(ourSamples[-isZero])
 
 		# shape s > 0, scale m > 0, family f > 0
-		allLogs = dgweibull(ourSamples, s=params[1], m=params[2], f=params[3], log=TRUE)
+		allLogs = rmutil::dgweibull(ourSamples, s=params[1], m=params[2], f=params[3], log=TRUE)
 
 		problems = which(!is.finite(allLogs))
 		if(length(problems) > 0 && length(problems) <= 5){
@@ -104,7 +104,7 @@ expweibull.lines = function(samples, params, useC=FALSE, ...){
 
 	x = seq(minVal, maxVal, length=1000)
 	x[x <= 1e-10] = 1e-10
-	y = dgweibull(x, s=params[1], m=params[2], f=params[3])
+	y = rmutil::dgweibull(x, s=params[1], m=params[2], f=params[3])
 
 	if(useC)
 		x = x + params[length(params)]

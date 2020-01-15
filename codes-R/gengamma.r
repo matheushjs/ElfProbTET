@@ -1,4 +1,4 @@
-require(flexsurv)
+require(ggamma)
 require(GenSA)
 
 source("myoptim.r")
@@ -17,7 +17,7 @@ gengamma.infer = function(samples, useHeuristic=FALSE, useC=FALSE){
 			ourSamples[isZero] = min(ourSamples[-isZero])
 
 		# shape > 0, scale > 0, k > 0
-		allLogs = dgengamma.orig(ourSamples, shape=params[1], scale=params[2], k=params[3], log=TRUE)
+		allLogs = dggamma(ourSamples, a=params[1], b=params[2], k=params[3], log=TRUE)
 
 		problems = which(!is.finite(allLogs))
 		if(length(problems) > 0 && length(problems) <= 5){
@@ -76,9 +76,9 @@ gengamma.infer = function(samples, useHeuristic=FALSE, useC=FALSE){
 
 	retval = as.data.frame(retval)
 	if(useC == FALSE){
-		colnames(retval) = c("shape", "scale", "k", "value", "convergence")
+		colnames(retval) = c("a", "b", "k", "value", "convergence")
 	} else {
-		colnames(retval) = c("shape", "scale", "k", "c", "value", "convergence")
+		colnames(retval) = c("a", "b", "k", "c", "value", "convergence")
 	}
 
 	# We sort it by value
@@ -102,7 +102,7 @@ gengamma.lines = function(samples, params, useC=FALSE, ...){
 	}
 
 	x = seq(minVal, maxVal, length=1000)
-	y = dgengamma.orig(x, shape=params[1], scale=params[2], k=params[3])
+	y = dggamma(x, a=params[1], b=params[2], k=params[3])
 	
 	if(useC)
 		x = x + params[length(params)]
