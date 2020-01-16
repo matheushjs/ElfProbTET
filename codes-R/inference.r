@@ -40,8 +40,8 @@ mycolors = c(
 );
 
 getlwd = function(idx){
-	#return( 12 - 1.2*(idx-1) );
-	rep(3, length(idx));
+	return( 5 - 0.3*(idx-1) );
+	#rep(3, length(idx));
 }
 
 # Already prepares all sample sets, with all information we might need
@@ -90,6 +90,9 @@ samples.hist = function(samples, breaks=20, main="", xmin=NULL){
 
 	if(is.numeric(xmin))
 		limits[1] = xmin
+
+	# I want 'breaks' bins in the interval shown, not in the whole interval
+	breaks = ceiling(breaks * (max(samples) - min(samples)) / (limits[2] - limits[1]) )
 
 	# Plot the resulting pdf
 	histData = hist(samples, breaks=breaks, prob=T, col="peachpuff", xlab="Execution Time (s)", main=main, xlim=limits)
@@ -206,7 +209,7 @@ generate.plots = function(fullDataset, zeroPositioning=FALSE, useHeuristic=FALSE
 			print(df, width=150)
 			write.csv(df, file=paste(dataset$fileroot, "-", psize, ".csv", sep=""))
 
-			legend("topright", unname(unlist(df["model"])), lty=1:nrow(df), col=mycolors[1:nrow(df)], lwd=getlwd(1:nrow(df)))
+			legend("topright", unname(unlist(df["model"])), lty=1:nrow(df), col=mycolors[1:nrow(df)], lwd=getlwd(1:nrow(df)), seg.len=5)
 
 			outputName = paste(dataset$fileroot, "-", psize, ".png", sep="")
 			savePlot(outputName, type="png")
