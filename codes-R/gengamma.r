@@ -79,7 +79,17 @@ gengamma.infer = function(samples, useC=FALSE){
 	sortedIdx = sort.list(retval$value, decreasing=FALSE)
 	retval = retval[sortedIdx,]
 
-	return(retval)
+	# Now perform cross validation using the best parameters as initial conditions
+	bestResult = retval[nrow(retval),];
+	if(useC == FALSE){
+		params = bestResult[1,1:3];
+		cross  = cross.validation(params, samples, likelihood, C=0, lower=lower, upper=upper, method="L-BFGS-B");
+	} else {
+		params = bestResult[1,1:4];
+		cross  = cross.validation(params, samples, likelihood, C=p[length(p)], lower=lower, upper=upper, method="L-BFGS-B");
+	}
+
+	return(list(results=retval, cross=cross));
 }
 
 gengamma.lines = function(samples, params, useC=FALSE, ...){

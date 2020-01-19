@@ -127,81 +127,95 @@ generate.plots = function(fullDataset, zeroPositioning=FALSE, useC=FALSE, useMin
 			samples.hist(samples, main=title, xmin=histMinX)
 
 			elapsed = system.time({ retval = gamma.infer(samples, useC) })["elapsed"]
-			retval = retval[nrow(retval),]
-			params = as.numeric(retval[1:(length(retval)-2)])
+			results = retval$results;
+			results = results[nrow(results),]
+			params = as.numeric(results[1:(length(results)-2)])
 			nParams = length(params)
-			errors = retval["convergence"] != 0
+			errors = results["convergence"] != 0
 			errorRatio = sum(errors) / length(errors)
-			minus2l = -2*retval["value"]
+			minus2l = -2*results["value"]
 			gamma.lines(samples, params, useC, lty=1, col=mycolors[1], lwd=getlwd(1))
-			df = rbind(df, c(title, "Gamma", paste.vector(params), 
+			df = rbind(df, c(title, "Gamma", paste.vector(params),
+							 retval$cross,
 							 paste(minus2l), paste(minus2l + 2*nParams), paste(minus2l + 2*nParams*sampleSize/(sampleSize - nParams - 1)),
 							 paste(minus2l + 2*nParams*log(log(sampleSize))), paste(minus2l + nParams*log(sampleSize)), paste(elapsed), paste(errorRatio)),
 					   stringsAsFactors=FALSE)
-			colnames(df) = c("title", "model", "estimates", "-2l", "AIC", "CAIC", "BIC", "HQIC", "elapsed.time", "optErrorRatio")
+			colnames(df) = c("title", "model", "estimates", "crossValid", "-2l", "AIC", "CAIC", "BIC", "HQIC", "elapsed.time", "optErrorRatio")
 
 			elapsed = system.time({ retval = weibull.infer(samples, useC) })["elapsed"]
-			retval = retval[nrow(retval),]
-			params = as.numeric(retval[1:(length(retval)-2)])
+			results = retval$results;
+			results = results[nrow(results),]
+			params = as.numeric(results[1:(length(results)-2)])
 			nParams = length(params)
-			minus2l = -2*retval["value"]
+			minus2l = -2*results["value"]
 			weibull.lines(samples, params, useC, lty=2, col=mycolors[2], lwd=getlwd(2))
 			df = rbind(df, c(title, "Weibull", paste.vector(params),
+							 retval$cross,
 							 paste(minus2l), paste(minus2l + 2*nParams), paste(minus2l + 2*nParams*sampleSize/(sampleSize - nParams - 1)),
 							 paste(minus2l + 2*nParams*log(log(sampleSize))), paste(minus2l + nParams*log(sampleSize)), paste(elapsed), paste(errorRatio)),
 					   stringsAsFactors=FALSE)
 
 			elapsed = system.time({ retval = norm.infer(samples, useC) })["elapsed"]
-			retval = retval[nrow(retval),]
-			params = as.numeric(retval[1:(length(retval)-2)])
+			results = retval$results;
+			results = results[nrow(results),]
+			params = as.numeric(results[1:(length(results)-2)])
 			nParams = length(params)
-			minus2l = -2*retval["value"]
+			minus2l = -2*results["value"]
 			norm.lines(samples, params, useC, lty=3, col=mycolors[3], lwd=getlwd(3))
 			df = rbind(df, c(title, "Normal", paste.vector(params),
+							 retval$cross,
 							 paste(minus2l), paste(minus2l + 2*nParams), paste(minus2l + 2*nParams*sampleSize/(sampleSize - nParams - 1)),
 							 paste(minus2l + 2*nParams*log(log(sampleSize))), paste(minus2l + nParams*log(sampleSize)), paste(elapsed), paste(errorRatio)),
 					   stringsAsFactors=FALSE)
 
 			elapsed = system.time({ retval = tnorm.infer(samples, useC) })["elapsed"]
-			retval = retval[nrow(retval),]
-			params = as.numeric(retval[1:(length(retval)-2)])
+			results = retval$results;
+			results = results[nrow(results),]
+			params = as.numeric(results[1:(length(results)-2)])
 			nParams = length(params)
-			minus2l = -2*retval["value"]
+			minus2l = -2*results["value"]
 			tnorm.lines(samples, params, useC, lty=4, col=mycolors[4], lwd=getlwd(4))
 			df = rbind(df, c(title, "T.Normal", paste.vector(params),
+							 retval$cross,
 							 paste(minus2l), paste(minus2l + 2*nParams), paste(minus2l + 2*nParams*sampleSize/(sampleSize - nParams - 1)),
 							 paste(minus2l + 2*nParams*log(log(sampleSize))), paste(minus2l + nParams*log(sampleSize)), paste(elapsed), paste(errorRatio)),
 					   stringsAsFactors=FALSE)
 
 			elapsed = system.time({ retval = kwcwg.infer(samples, useC) })["elapsed"]
-			retval = retval[nrow(retval),]
-			params = as.numeric(retval[1:(length(retval)-2)])
+			results = retval$results;
+			results = results[nrow(results),]
+			params = as.numeric(results[1:(length(results)-2)])
 			nParams = length(params)
-			minus2l = -2*retval["value"]
+			minus2l = -2*results["value"]
 			kwcwg.lines(samples, params, useC, lty=5, col=mycolors[5], lwd=getlwd(5))
 			df = rbind(df, c(title, "KW-CWG", paste.vector(params),
+							 retval$cross,
 							 paste(minus2l), paste(minus2l + 2*nParams), paste(minus2l + 2*nParams*sampleSize/(sampleSize - nParams - 1)),
 							 paste(minus2l + 2*nParams*log(log(sampleSize))), paste(minus2l + nParams*log(sampleSize)), paste(elapsed), paste(errorRatio)),
 					   stringsAsFactors=FALSE)
 
 			elapsed = system.time({ retval = gengamma.infer(samples, useC) })["elapsed"]
-			retval = retval[nrow(retval),]
-			params = as.numeric(retval[1:(length(retval)-2)])
+			results = retval$results;
+			results = results[nrow(results),]
+			params = as.numeric(results[1:(length(results)-2)])
 			nParams = length(params)
-			minus2l = -2*retval["value"]
+			minus2l = -2*results["value"]
 			gengamma.lines(samples, params, useC, lty=6, col=mycolors[6], lwd=getlwd(6))
 			df = rbind(df, c(title, "G.Gamma", paste.vector(params),
+							 retval$cross,
 							 paste(minus2l), paste(minus2l + 2*nParams), paste(minus2l + 2*nParams*sampleSize/(sampleSize - nParams - 1)),
 							 paste(minus2l + 2*nParams*log(log(sampleSize))), paste(minus2l + nParams*log(sampleSize)), paste(elapsed), paste(errorRatio)),
 					   stringsAsFactors=FALSE)
 
 			elapsed = system.time({ retval = expweibull.infer(samples, useC) })["elapsed"]
-			retval = retval[nrow(retval),]
-			params = as.numeric(retval[1:(length(retval)-2)])
+			results = retval$results;
+			results = results[nrow(results),]
+			params = as.numeric(results[1:(length(results)-2)])
 			nParams = length(params)
-			minus2l = -2*retval["value"]
+			minus2l = -2*results["value"]
 			expweibull.lines(samples, params, useC, lty=7, col=mycolors[7], lwd=getlwd(7))
 			df = rbind(df, c(title, "E.Weibull", paste.vector(params),
+							 retval$cross,
 							 paste(minus2l), paste(minus2l + 2*nParams), paste(minus2l + 2*nParams*sampleSize/(sampleSize - nParams - 1)),
 							 paste(minus2l + 2*nParams*log(log(sampleSize))), paste(minus2l + nParams*log(sampleSize)), paste(elapsed), paste(errorRatio)),
 					   stringsAsFactors=FALSE)
