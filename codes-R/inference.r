@@ -100,7 +100,7 @@ samples.hist = function(samples, breaks=20, main="", xmin=NULL){
 
 # Process all files and save all plots
 # If zeroPositioning is TRUE, we subtract the lowest execution time from the sample, making the empirical distribution begin at zero.
-generate.plots = function(fullDataset, zeroPositioning=FALSE, useHeuristic=FALSE, useC=FALSE, useMinEstimator=FALSE){
+generate.plots = function(fullDataset, zeroPositioning=FALSE, useC=FALSE, useMinEstimator=FALSE){
 	for(i in 1:length(fullDataset)){
 		dataset = fullDataset[[i]]
 
@@ -126,7 +126,7 @@ generate.plots = function(fullDataset, zeroPositioning=FALSE, useHeuristic=FALSE
 
 			samples.hist(samples, main=title, xmin=histMinX)
 
-			elapsed = system.time({ retval = gamma.infer(samples, useHeuristic, useC) })["elapsed"]
+			elapsed = system.time({ retval = gamma.infer(samples, useC) })["elapsed"]
 			retval = retval[nrow(retval),]
 			params = as.numeric(retval[1:(length(retval)-2)])
 			nParams = length(params)
@@ -140,7 +140,7 @@ generate.plots = function(fullDataset, zeroPositioning=FALSE, useHeuristic=FALSE
 					   stringsAsFactors=FALSE)
 			colnames(df) = c("title", "model", "estimates", "-2l", "AIC", "CAIC", "BIC", "HQIC", "elapsed.time", "optErrorRatio")
 
-			elapsed = system.time({ retval = weibull.infer(samples, useHeuristic, useC) })["elapsed"]
+			elapsed = system.time({ retval = weibull.infer(samples, useC) })["elapsed"]
 			retval = retval[nrow(retval),]
 			params = as.numeric(retval[1:(length(retval)-2)])
 			nParams = length(params)
@@ -151,7 +151,7 @@ generate.plots = function(fullDataset, zeroPositioning=FALSE, useHeuristic=FALSE
 							 paste(minus2l + 2*nParams*log(log(sampleSize))), paste(minus2l + nParams*log(sampleSize)), paste(elapsed), paste(errorRatio)),
 					   stringsAsFactors=FALSE)
 
-			elapsed = system.time({ retval = norm.infer(samples, useHeuristic, useC) })["elapsed"]
+			elapsed = system.time({ retval = norm.infer(samples, useC) })["elapsed"]
 			retval = retval[nrow(retval),]
 			params = as.numeric(retval[1:(length(retval)-2)])
 			nParams = length(params)
@@ -162,7 +162,7 @@ generate.plots = function(fullDataset, zeroPositioning=FALSE, useHeuristic=FALSE
 							 paste(minus2l + 2*nParams*log(log(sampleSize))), paste(minus2l + nParams*log(sampleSize)), paste(elapsed), paste(errorRatio)),
 					   stringsAsFactors=FALSE)
 
-			elapsed = system.time({ retval = tnorm.infer(samples, useHeuristic, useC) })["elapsed"]
+			elapsed = system.time({ retval = tnorm.infer(samples, useC) })["elapsed"]
 			retval = retval[nrow(retval),]
 			params = as.numeric(retval[1:(length(retval)-2)])
 			nParams = length(params)
@@ -173,7 +173,7 @@ generate.plots = function(fullDataset, zeroPositioning=FALSE, useHeuristic=FALSE
 							 paste(minus2l + 2*nParams*log(log(sampleSize))), paste(minus2l + nParams*log(sampleSize)), paste(elapsed), paste(errorRatio)),
 					   stringsAsFactors=FALSE)
 
-			elapsed = system.time({ retval = kwcwg.infer(samples, useHeuristic, useC) })["elapsed"]
+			elapsed = system.time({ retval = kwcwg.infer(samples, useC) })["elapsed"]
 			retval = retval[nrow(retval),]
 			params = as.numeric(retval[1:(length(retval)-2)])
 			nParams = length(params)
@@ -184,7 +184,7 @@ generate.plots = function(fullDataset, zeroPositioning=FALSE, useHeuristic=FALSE
 							 paste(minus2l + 2*nParams*log(log(sampleSize))), paste(minus2l + nParams*log(sampleSize)), paste(elapsed), paste(errorRatio)),
 					   stringsAsFactors=FALSE)
 
-			elapsed = system.time({ retval = gengamma.infer(samples, useHeuristic, useC) })["elapsed"]
+			elapsed = system.time({ retval = gengamma.infer(samples, useC) })["elapsed"]
 			retval = retval[nrow(retval),]
 			params = as.numeric(retval[1:(length(retval)-2)])
 			nParams = length(params)
@@ -195,7 +195,7 @@ generate.plots = function(fullDataset, zeroPositioning=FALSE, useHeuristic=FALSE
 							 paste(minus2l + 2*nParams*log(log(sampleSize))), paste(minus2l + nParams*log(sampleSize)), paste(elapsed), paste(errorRatio)),
 					   stringsAsFactors=FALSE)
 
-			elapsed = system.time({ retval = expweibull.infer(samples, useHeuristic, useC) })["elapsed"]
+			elapsed = system.time({ retval = expweibull.infer(samples, useC) })["elapsed"]
 			retval = retval[nrow(retval),]
 			params = as.numeric(retval[1:(length(retval)-2)])
 			nParams = length(params)

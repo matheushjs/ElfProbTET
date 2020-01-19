@@ -1,10 +1,7 @@
-require(GenSA)
-
 source("myoptim.r")
 
-# @param useHeuristic Tells us to use genetic algorithm as optimization function.
 # @param useC Tells us to also estimate parameter C, which is the amount to subtract from the samples.
-gamma.infer = function(samples, useHeuristic=FALSE, useC=FALSE){
+gamma.infer = function(samples, useC=FALSE){
 	estimatedC    = min(samples) * 0.995
 
 	# The likelihood function
@@ -43,22 +40,12 @@ gamma.infer = function(samples, useHeuristic=FALSE, useC=FALSE){
 		upper = c(Inf, Inf, min(samples) - 1e-10)
 	}
 
-	if(useHeuristic == FALSE){
-		shapeList = c(0.5, 2, 5, 10, 20, 100, 200, 500, 1000, 5000, 10000, 20000)
-	} else {
-		shapeList = c(5)
-	}
-
+	shapeList = c(0.5, 2, 5, 10, 20, 100, 200, 500, 1000, 5000, 10000, 20000)
 	for(shape in shapeList){
 		# The mean of a gamma is shape*scale
 		# So we estimate the scale as being scale = mean(samples) / shape
 		estimatedScale = mean(samples) / shape
-
-		if(useHeuristic == FALSE){
-			scaleList = c(estimatedScale * 0.666, estimatedScale, estimatedScale*1.5)
-		} else {
-			scaleList = c(estimatedScale)
-		}
+		scaleList = c(estimatedScale * 0.666, estimatedScale, estimatedScale*1.5)
 
 		for(scale in scaleList){
 			params = c(shape, scale)
@@ -67,16 +54,12 @@ gamma.infer = function(samples, useHeuristic=FALSE, useC=FALSE){
 			# print(params)
 			
 			#cat("Optimizing with initial params:", params, "\n")
-			if(useHeuristic == FALSE){
-				if(useC == FALSE){
-					result = myoptim(params, function(p) likelihood(p), lower=lower, upper=upper, method="L-BFGS-B")
-					result = myoptim(result$par, function(p) likelihood(p), lower=lower, upper=upper, method="L-BFGS-B")
-				} else {
-					result = myoptim(params, function(p) likelihood(p, p[length(p)]), lower=lower, upper=upper, method="L-BFGS-B")
-					result = myoptim(result$par, function(p) likelihood(p, p[length(p)]), lower=lower, upper=upper, method="L-BFGS-B")
-				}
+			if(useC == FALSE){
+				result = myoptim(params, function(p) likelihood(p), lower=lower, upper=upper, method="L-BFGS-B")
+				result = myoptim(result$par, function(p) likelihood(p), lower=lower, upper=upper, method="L-BFGS-B")
 			} else {
-				result = GenSA(params, likelihood, lower=lower, upper=upper)
+				result = myoptim(params, function(p) likelihood(p, p[length(p)]), lower=lower, upper=upper, method="L-BFGS-B")
+				result = myoptim(result$par, function(p) likelihood(p, p[length(p)]), lower=lower, upper=upper, method="L-BFGS-B")
 			}
 
 			params = result$par

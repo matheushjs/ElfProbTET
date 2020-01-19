@@ -1,4 +1,3 @@
-require(GenSA)
 require(elfDistr)
 
 source("myoptim.r")
@@ -66,9 +65,8 @@ source("myoptim.r")
 #}
 
 # Get the parameters of the kwcwg after fitting the samples
-# @param useHeuristic Tells us to use genetic algorithm as optimization function.
 # @param useC Tells us to also estimate parameter C, which is the amount to subtract from the samples.
-kwcwg.infer = function(samples, useHeuristic=FALSE, useC=FALSE){
+kwcwg.infer = function(samples, useC=FALSE){
 	# This quantile is apparently a good estimator for the beta parameter
 	estimatedBeta = quantile(samples, p=.632)
 	estimatedC    = min(samples) * 0.995
@@ -126,16 +124,12 @@ kwcwg.infer = function(samples, useHeuristic=FALSE, useC=FALSE){
 		# print(params)
 		
 		# cat("Optimizing with initial params:", params, "\n")
-		if(useHeuristic == FALSE){
-			if(useC == FALSE){
-				result = myoptim(params, function(p) likelihood(p), lower=lower, upper=upper, method="L-BFGS-B")
-				result = myoptim(result$par, function(p) likelihood(p), lower=lower, upper=upper, method="L-BFGS-B")
-			} else {
-				result = myoptim(params, function(p) likelihood(p, p[length(p)]), lower=lower, upper=upper, method="L-BFGS-B")
-				result = myoptim(result$par, function(p) likelihood(p, p[length(p)]), lower=lower, upper=upper, method="L-BFGS-B")
-			}
+		if(useC == FALSE){
+			result = myoptim(params, function(p) likelihood(p), lower=lower, upper=upper, method="L-BFGS-B")
+			result = myoptim(result$par, function(p) likelihood(p), lower=lower, upper=upper, method="L-BFGS-B")
 		} else {
-			result = GenSA(params, likelihood, lower=lower, upper=upper)
+			result = myoptim(params, function(p) likelihood(p, p[length(p)]), lower=lower, upper=upper, method="L-BFGS-B")
+			result = myoptim(result$par, function(p) likelihood(p, p[length(p)]), lower=lower, upper=upper, method="L-BFGS-B")
 		}
 
 		params = result$par
