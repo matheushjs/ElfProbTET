@@ -7,8 +7,8 @@ expweibull.infer = function(samples, useC=FALSE){
 	estimatedC    = min(samples) * 0.995
 
 	# The likelihood function
-	likelihood = function(params, C=0){
-		ourSamples = samples - C;
+	likelihood = function(ourSamples, params, C=0){
+		ourSamples = ourSamples - C;
 
 		# dgweibull does not accept a sample of value 0, so we fix this here
 		isZero = which(ourSamples == 0)
@@ -54,11 +54,11 @@ expweibull.infer = function(samples, useC=FALSE){
 		
 		# cat("Optimizing with initial params:", params, "\n")
 		if(useC == FALSE){
-			result = myoptim(params, function(p) likelihood(p), lower=lower, upper=upper, method="L-BFGS-B")
-			result = myoptim(result$par, function(p) likelihood(p), lower=lower, upper=upper, method="L-BFGS-B")
+			result = myoptim(params, function(p) likelihood(samples, p), lower=lower, upper=upper, method="L-BFGS-B")
+			result = myoptim(result$par, function(p) likelihood(samples, p), lower=lower, upper=upper, method="L-BFGS-B")
 		} else {
-			result = myoptim(params, function(p) likelihood(p, p[length(p)]), lower=lower, upper=upper, method="L-BFGS-B")
-			result = myoptim(result$par, function(p) likelihood(p, p[length(p)]), lower=lower, upper=upper, method="L-BFGS-B")
+			result = myoptim(params, function(p) likelihood(samples, p, p[length(p)]), lower=lower, upper=upper, method="L-BFGS-B")
+			result = myoptim(result$par, function(p) likelihood(samples, p, p[length(p)]), lower=lower, upper=upper, method="L-BFGS-B")
 		}
 		
 		params = result$par
