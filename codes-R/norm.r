@@ -84,10 +84,10 @@ norm.infer = function(samples, useC=FALSE){
 	bestResult = retval[nrow(retval),];
 	if(useC == FALSE){
 		params = bestResult[1,1:2];
-		cross  = cross.validation(params, samples, likelihood, C=0, lower=lower, upper=upper, method="L-BFGS-B");
+		cross  = cross.validation(params, samples, likelihood, useC=F, lower=lower, upper=upper, method="L-BFGS-B");
 	} else {
 		params = bestResult[1,1:3];
-		cross  = cross.validation(params, samples, likelihood, C=p[length(p)], lower=lower, upper=upper, method="L-BFGS-B");
+		cross  = cross.validation(params, samples, likelihood, useC=T, lower=lower, upper=upper, method="L-BFGS-B");
 	}
 
 	return(list(results=retval, cross=cross));

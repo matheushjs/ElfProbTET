@@ -8,7 +8,7 @@ myoptim = function(params, f, ...){
 		return(list(par=rep(0, length(params)), value=1e300, convergence=0))
 }
 
-cross.validation = function(params, samples, likelihood, C=C, folds=5, ...){
+cross.validation = function(params, samples, likelihood, useC=F, folds=5, ...){
 	foldLen = length(samples) / folds;
 	testResults = rep(0, folds);
 
@@ -17,8 +17,13 @@ cross.validation = function(params, samples, likelihood, C=C, folds=5, ...){
 		test = samples[foldIdx];
 		train = samples[-foldIdx];
 
-		result = myoptim(params, function(p) likelihood(train, p, C=C), ...);
-		testResults[i] = likelihood(test, result$par, C=C);
+		if(useC == FALSE){
+			result = myoptim(params, function(p) likelihood(train, p, C=0), ...);
+			testResults[i] = likelihood(test, result$par, C=0);
+		} else {
+			result = myoptim(params, function(p) likelihood(train, p, C=p[length(p)]), ...);
+			testResults[i] = likelihood(test, result$par, C=result$par[length(result$par)]);
+		}
 	}
 
 	mean(testResults);
