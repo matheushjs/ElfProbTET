@@ -113,4 +113,9 @@ norm.lines = function(samples, params, useC=FALSE, ...){
 		x = x + params[length(params)]
 
 	lines(x, y, ...)
+
+	#pointsX = seq(minVal, maxVal, length=20) + runif(max=(maxVal - minVal)*0.1, n=1);
+	#pointsY = dnorm(pointsX, mean=params[1], sd=params[2])
+	#args = list(...)
+	#points(pointsX, pointsY, pch=2, lwd=2, cex=2, col=args$col);
 }

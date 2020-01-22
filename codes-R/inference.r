@@ -28,19 +28,27 @@ paste.vector = function(vec){
 	return(retval)
 }
 
-mycolors = c(
-	"#000000FF",
-	"#FF0000FF",
-	"#00FF00FF",
-	"#0000FFFF",
-	"#00FFFFFF",
-	"#FF00FFFF",
-	"#FFFF00FF",
-	"#999999FF"
+mycolors = inferno(100)[c(1, 40, 66, 95)];
+#c(
+#	"#000000FF",
+#	"#FF0000FF",
+#	"#00FF00FF",
+#	"#0000FFFF",
+#	"#00FFFFFF",
+#	"#FF00FFFF",
+#	"#FFFF00FF",
+#	"#999999FF"
+#);
+
+mylty = c(
+	"solid",
+	"62",
+	"44",
+	"26"
 );
 
 getlwd = function(idx){
-	return( 5 - 0.3*(idx-1) );
+	return( 7 - 0.5*(idx-1) );
 	#rep(3, length(idx));
 }
 
@@ -122,9 +130,12 @@ generate.plots = function(fullDataset, zeroPositioning=FALSE, useC=FALSE, useMin
 				histMinX = 0
 			}
 
+			dev.new(width=1*12, height=1*6)
+			par(mfrow=c(1, 2));
+			samples.hist(samples, xmin=histMinX)
+			
 			title = paste(capitalize(dataset$algorithm), capitalize(dataset$machine), psize, sep="-")
-
-			samples.hist(samples, main=title, xmin=histMinX)
+			title(title, side = 3, line = -3, outer = TRUE)
 
 			elapsed = system.time({ retval = gamma.infer(samples, useC) })["elapsed"]
 			results = retval$results;
@@ -134,7 +145,7 @@ generate.plots = function(fullDataset, zeroPositioning=FALSE, useC=FALSE, useMin
 			errors = results["convergence"] != 0
 			errorRatio = sum(errors) / length(errors)
 			minus2l = -2*results["value"]
-			gamma.lines(samples, params, useC, lty=1, col=mycolors[1], lwd=getlwd(1))
+			gamma.lines(samples, params, useC, lty=mylty[1], col=mycolors[1], lwd=getlwd(1))
 			df = rbind(df, c(title, "Gamma", paste.vector(params),
 							 retval$cross,
 							 paste(minus2l), paste(minus2l + 2*nParams), paste(minus2l + 2*nParams*sampleSize/(sampleSize - nParams - 1)),
@@ -148,7 +159,7 @@ generate.plots = function(fullDataset, zeroPositioning=FALSE, useC=FALSE, useMin
 			params = as.numeric(results[1:(length(results)-2)])
 			nParams = length(params)
 			minus2l = -2*results["value"]
-			weibull.lines(samples, params, useC, lty=2, col=mycolors[2], lwd=getlwd(2))
+			weibull.lines(samples, params, useC, lty=mylty[2], col=mycolors[2], lwd=getlwd(2))
 			df = rbind(df, c(title, "Weibull", paste.vector(params),
 							 retval$cross,
 							 paste(minus2l), paste(minus2l + 2*nParams), paste(minus2l + 2*nParams*sampleSize/(sampleSize - nParams - 1)),
@@ -161,7 +172,7 @@ generate.plots = function(fullDataset, zeroPositioning=FALSE, useC=FALSE, useMin
 			params = as.numeric(results[1:(length(results)-2)])
 			nParams = length(params)
 			minus2l = -2*results["value"]
-			norm.lines(samples, params, useC, lty=3, col=mycolors[3], lwd=getlwd(3))
+			norm.lines(samples, params, useC, lty=mylty[3], col=mycolors[3], lwd=getlwd(3))
 			df = rbind(df, c(title, "Normal", paste.vector(params),
 							 retval$cross,
 							 paste(minus2l), paste(minus2l + 2*nParams), paste(minus2l + 2*nParams*sampleSize/(sampleSize - nParams - 1)),
@@ -174,12 +185,15 @@ generate.plots = function(fullDataset, zeroPositioning=FALSE, useC=FALSE, useMin
 			params = as.numeric(results[1:(length(results)-2)])
 			nParams = length(params)
 			minus2l = -2*results["value"]
-			tnorm.lines(samples, params, useC, lty=4, col=mycolors[4], lwd=getlwd(4))
+			tnorm.lines(samples, params, useC, lty=mylty[4], col=mycolors[4], lwd=getlwd(4))
 			df = rbind(df, c(title, "T.Normal", paste.vector(params),
 							 retval$cross,
 							 paste(minus2l), paste(minus2l + 2*nParams), paste(minus2l + 2*nParams*sampleSize/(sampleSize - nParams - 1)),
 							 paste(minus2l + 2*nParams*log(log(sampleSize))), paste(minus2l + nParams*log(sampleSize)), paste(elapsed), paste(errorRatio)),
 					   stringsAsFactors=FALSE)
+
+			legend("topright", unname(unlist(df["model"]))[1:4], lty=mylty[1:4], col=mycolors[1:4], lwd=getlwd(1:4), seg.len=5);
+			samples.hist(samples, xmin=histMinX)
 
 			elapsed = system.time({ retval = kwcwg.infer(samples, useC) })["elapsed"]
 			results = retval$results;
@@ -187,7 +201,7 @@ generate.plots = function(fullDataset, zeroPositioning=FALSE, useC=FALSE, useMin
 			params = as.numeric(results[1:(length(results)-2)])
 			nParams = length(params)
 			minus2l = -2*results["value"]
-			kwcwg.lines(samples, params, useC, lty=5, col=mycolors[5], lwd=getlwd(5))
+			kwcwg.lines(samples, params, useC, lty=mylty[1], col=mycolors[1], lwd=getlwd(2))
 			df = rbind(df, c(title, "KW-CWG", paste.vector(params),
 							 retval$cross,
 							 paste(minus2l), paste(minus2l + 2*nParams), paste(minus2l + 2*nParams*sampleSize/(sampleSize - nParams - 1)),
@@ -200,7 +214,7 @@ generate.plots = function(fullDataset, zeroPositioning=FALSE, useC=FALSE, useMin
 			params = as.numeric(results[1:(length(results)-2)])
 			nParams = length(params)
 			minus2l = -2*results["value"]
-			gengamma.lines(samples, params, useC, lty=6, col=mycolors[6], lwd=getlwd(6))
+			gengamma.lines(samples, params, useC, lty=mylty[2], col=mycolors[2], lwd=getlwd(2))
 			df = rbind(df, c(title, "G.Gamma", paste.vector(params),
 							 retval$cross,
 							 paste(minus2l), paste(minus2l + 2*nParams), paste(minus2l + 2*nParams*sampleSize/(sampleSize - nParams - 1)),
@@ -213,7 +227,7 @@ generate.plots = function(fullDataset, zeroPositioning=FALSE, useC=FALSE, useMin
 			params = as.numeric(results[1:(length(results)-2)])
 			nParams = length(params)
 			minus2l = -2*results["value"]
-			expweibull.lines(samples, params, useC, lty=7, col=mycolors[7], lwd=getlwd(7))
+			expweibull.lines(samples, params, useC, lty=mylty[3], col=mycolors[3], lwd=getlwd(3))
 			df = rbind(df, c(title, "E.Weibull", paste.vector(params),
 							 retval$cross,
 							 paste(minus2l), paste(minus2l + 2*nParams), paste(minus2l + 2*nParams*sampleSize/(sampleSize - nParams - 1)),
@@ -223,10 +237,11 @@ generate.plots = function(fullDataset, zeroPositioning=FALSE, useC=FALSE, useMin
 			print(df, width=150)
 			write.csv(df, file=paste(dataset$fileroot, "-", psize, ".csv", sep=""))
 
-			legend("topright", unname(unlist(df["model"])), lty=1:nrow(df), col=mycolors[1:nrow(df)], lwd=getlwd(1:nrow(df)), seg.len=5)
+			legend("topright", unname(unlist(df["model"]))[5:7], lty=mylty[1:3], col=mycolors[1:3], lwd=getlwd(1:3), seg.len=5);
 
 			outputName = paste(dataset$fileroot, "-", psize, ".png", sep="")
 			savePlot(outputName, type="png")
+			graphics.off();
 		}
 	}
 }
