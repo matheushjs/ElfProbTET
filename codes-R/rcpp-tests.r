@@ -50,8 +50,14 @@ h = function(x){
 #		}))
 #}
 
+i = function(x){
+	return(log2(log(sqrt(exp(x**2)))**10));
+}
+
+
+
 x = 1:1e5
-result = microbenchmark::microbenchmark(f(x), g(x), h(x), unit="ms")
+result = microbenchmark::microbenchmark(f(x), g(x), h(x), i(x), unit="ms")
 
 
 print(result)
