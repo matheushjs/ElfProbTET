@@ -11,6 +11,7 @@ myoptim = function(params, f, ...){
 cross.validation = function(params, samples, likelihood, useC=F, folds=5, ...){
 	foldLen = length(samples) / folds;
 	testResults = rep(0, folds);
+	samples = sample(samples);
 
 	for(i in 1:folds){
 		foldIdx = (foldLen*(i-1) + 1):(foldLen*i);
