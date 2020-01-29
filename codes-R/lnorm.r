@@ -27,8 +27,11 @@ lnorm.infer = function(samples, useC=FALSE){
 	}
 
 	if(useC == FALSE){
-		sampleMean = mean(log(samples))
-		sampleSd   = sd(log(samples))
+		# In case we used zero positioning
+		s = samples
+		s[s == 0] = min(s[s != 0]);
+		sampleMean = mean(log(s))
+		sampleSd   = sd(log(s))
 	} else {
 		ourSamples = samples - estimatedC
 		sampleMean = mean(log(ourSamples))
@@ -51,7 +54,7 @@ lnorm.infer = function(samples, useC=FALSE){
 		if(useC)
 			params = c(params, estimatedC)
 		# print(params)
-		
+
 		# cat("Optimizing with initial params:", params, "\n")
 		if(useC == FALSE){
 			result = myoptim(params, function(p) likelihood(samples, p), lower=lower, upper=upper, method="L-BFGS-B")
