@@ -8,6 +8,7 @@ source("./norm.r")
 source("./gengamma.r")
 source("./expweibull.r")
 source("./ollggamma.r")
+source("./lnorm.r")
 
 # Returns the sample sets in each file
 # Each file has 1000 samples for each experiment made, so each sample set has 1000 entries
@@ -29,17 +30,17 @@ paste.vector = function(vec){
 	return(retval)
 }
 
-mycolors = inferno(100)[c(1, 25, 45, 66, 95)];
-#c(
-#	"#000000FF",
-#	"#FF0000FF",
-#	"#00FF00FF",
-#	"#0000FFFF",
-#	"#00FFFFFF",
-#	"#FF00FFFF",
-#	"#FFFF00FF",
-#	"#999999FF"
-#);
+#mycolors = inferno(100)[c(1, 25, 45, 66, 95)];
+mycolors = c(
+	"#000000FF",
+	"#FF0000FF",
+	3,
+	"#0000FFFF",
+	"#00FFFFFF",
+	"#FF00FFFF",
+	"#FFFF00FF",
+	"#999999FF"
+);
 
 mylty = c(
 	"solid",
@@ -207,6 +208,24 @@ generate.plots = function(fullDataset, zeroPositioning=FALSE, useC=FALSE, useMin
 					   stringsAsFactors=FALSE)
 			plotCount = plotCount + 1;
 
+			elapsed = system.time({ retval = lnorm.infer(samples, useC) })["elapsed"]
+			results = retval$results;
+			results = results[nrow(results),]
+			params = as.numeric(results[1:(length(results)-2)])
+			nParams = length(params)
+			minus2l = -2*results["value"]
+			lnorm.lines(samples, params, useC, lty=mylty[plotCount], col=mycolors[plotCount], lwd=getlwd(plotCount))
+			df = rbind(df, c(title, "Lognormal", paste.vector(params),
+							 retval$cross,
+							 paste(minus2l), paste(minus2l + 2*nParams), paste(minus2l + 2*nParams*sampleSize/(sampleSize - nParams - 1)),
+							 paste(minus2l + 2*nParams*log(log(sampleSize))), paste(minus2l + nParams*log(sampleSize)), paste(elapsed), paste(errorRatio)),
+					   stringsAsFactors=FALSE)
+			plotCount = plotCount + 1;
+
+			legend("topright", unname(unlist(df["model"]))[1:5], lty=mylty[1:5], col=mycolors[1:5], lwd=getlwd(1:5), seg.len=5);
+			samples.hist(samples, xmin=histMinX)
+			plotCount = 1;
+
 			elapsed = system.time({ retval = ollgengamma.infer(samples, useC) })["elapsed"]
 			results = retval$results;
 			results = results[nrow(results),]
@@ -220,10 +239,6 @@ generate.plots = function(fullDataset, zeroPositioning=FALSE, useC=FALSE, useMin
 							 paste(minus2l + 2*nParams*log(log(sampleSize))), paste(minus2l + nParams*log(sampleSize)), paste(elapsed), paste(errorRatio)),
 					   stringsAsFactors=FALSE)
 			plotCount = plotCount + 1;
-
-			legend("topright", unname(unlist(df["model"]))[1:5], lty=mylty[1:5], col=mycolors[1:5], lwd=getlwd(1:5), seg.len=5);
-			samples.hist(samples, xmin=histMinX)
-			plotCount = 1;
 
 			elapsed = system.time({ retval = kwcwg.infer(samples, useC) })["elapsed"]
 			results = retval$results;
@@ -270,7 +285,7 @@ generate.plots = function(fullDataset, zeroPositioning=FALSE, useC=FALSE, useMin
 			print(df, width=150)
 			write.csv(df, file=paste(dataset$fileroot, "-", psize, ".csv", sep=""))
 
-			legend("topright", unname(unlist(df["model"]))[6:8], lty=mylty[1:3], col=mycolors[1:3], lwd=getlwd(1:3), seg.len=5);
+			legend("topright", unname(unlist(df["model"]))[6:9], lty=mylty[1:3], col=mycolors[1:3], lwd=getlwd(1:3), seg.len=5);
 
 			outputName = paste(dataset$fileroot, "-", psize, ".png", sep="")
 			savePlot(outputName, type="png")
