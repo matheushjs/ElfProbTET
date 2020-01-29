@@ -83,10 +83,10 @@ ollgengamma.infer = function(samples, useC=FALSE){
 	# Now perform cross validation using the best parameters as initial conditions
 	bestResult = retval[nrow(retval),];
 	if(useC == FALSE){
-		params = bestResult[1,1:3];
+		params = bestResult[1,1:4];
 		cross  = cross.validation(params, samples, likelihood, useC=F, lower=lower, upper=upper, method="L-BFGS-B");
 	} else {
-		params = bestResult[1,1:4];
+		params = bestResult[1,1:5];
 		cross  = cross.validation(params, samples, likelihood, useC=T, lower=lower, upper=upper, method="L-BFGS-B");
 	}
 
