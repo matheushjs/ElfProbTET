@@ -285,7 +285,7 @@ generate.plots = function(fullDataset, zeroPositioning=FALSE, useC=FALSE, useMin
 			print(df, width=150)
 			write.csv(df, file=paste(dataset$fileroot, "-", psize, ".csv", sep=""))
 
-			legend("topright", unname(unlist(df["model"]))[6:9], lty=mylty[1:3], col=mycolors[1:3], lwd=getlwd(1:3), seg.len=5);
+			legend("topright", unname(unlist(df["model"]))[6:9], lty=mylty[1:4], col=mycolors[1:4], lwd=getlwd(1:4), seg.len=5);
 
 			outputName = paste(dataset$fileroot, "-", psize, ".png", sep="")
 			savePlot(outputName, type="png")
