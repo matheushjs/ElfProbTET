@@ -7,6 +7,7 @@ source("./tnorm.r")
 source("./norm.r")
 source("./gengamma.r")
 source("./expweibull.r")
+source("./ollggamma.r")
 
 # Returns the sample sets in each file
 # Each file has 1000 samples for each experiment made, so each sample set has 1000 entries
@@ -28,7 +29,7 @@ paste.vector = function(vec){
 	return(retval)
 }
 
-mycolors = inferno(100)[c(1, 40, 66, 95)];
+mycolors = inferno(100)[c(1, 25, 45, 66, 95)];
 #c(
 #	"#000000FF",
 #	"#FF0000FF",
@@ -43,14 +44,23 @@ mycolors = inferno(100)[c(1, 40, 66, 95)];
 mylty = c(
 	"solid",
 	"62",
-	"44",
-	"26"
+	"43",
+	"24",
+	"12"
 );
 
 getlwd = function(idx){
 	return( 7 - 0.5*(idx-1) );
 	#rep(3, length(idx));
 }
+
+#x = seq(0, 10, length=1000);
+#idx=1; plot (x**(idx+1), lty=mylty[idx], col=mycolors[idx], lwd=7);
+#idx=2; lines(x**(idx+1), lty=mylty[idx], col=mycolors[idx], lwd=7);
+#idx=3; lines(x**(idx+1), lty=mylty[idx], col=mycolors[idx], lwd=7);
+#idx=4; lines(x**(idx+1), lty=mylty[idx], col=mycolors[idx], lwd=7);
+#idx=5; lines(x**(idx+1), lty=mylty[idx], col=mycolors[idx], lwd=7);
+#quit();
 
 # Already prepares all sample sets, with all information we might need
 # Returns a data frame with all information we need
@@ -133,7 +143,8 @@ generate.plots = function(fullDataset, zeroPositioning=FALSE, useC=FALSE, useMin
 			dev.new(width=1*12, height=1*6)
 			par(mfrow=c(1, 2));
 			samples.hist(samples, xmin=histMinX)
-			
+			plotCount = 1;
+
 			title = paste(capitalize(dataset$algorithm), capitalize(dataset$machine), psize, sep="-")
 			title(title, side = 3, line = -3, outer = TRUE)
 
@@ -145,12 +156,13 @@ generate.plots = function(fullDataset, zeroPositioning=FALSE, useC=FALSE, useMin
 			errors = results["convergence"] != 0
 			errorRatio = sum(errors) / length(errors)
 			minus2l = -2*results["value"]
-			gamma.lines(samples, params, useC, lty=mylty[1], col=mycolors[1], lwd=getlwd(1))
+			gamma.lines(samples, params, useC, lty=mylty[plotCount], col=mycolors[plotCount], lwd=getlwd(plotCount))
 			df = rbind(df, c(title, "Gamma", paste.vector(params),
 							 retval$cross,
 							 paste(minus2l), paste(minus2l + 2*nParams), paste(minus2l + 2*nParams*sampleSize/(sampleSize - nParams - 1)),
 							 paste(minus2l + 2*nParams*log(log(sampleSize))), paste(minus2l + nParams*log(sampleSize)), paste(elapsed), paste(errorRatio)),
 					   stringsAsFactors=FALSE)
+			plotCount = plotCount + 1;
 			colnames(df) = c("title", "model", "estimates", "crossValid", "-2l", "AIC", "CAIC", "BIC", "HQIC", "elapsed.time", "optErrorRatio")
 
 			elapsed = system.time({ retval = weibull.infer(samples, useC) })["elapsed"]
@@ -159,12 +171,13 @@ generate.plots = function(fullDataset, zeroPositioning=FALSE, useC=FALSE, useMin
 			params = as.numeric(results[1:(length(results)-2)])
 			nParams = length(params)
 			minus2l = -2*results["value"]
-			weibull.lines(samples, params, useC, lty=mylty[2], col=mycolors[2], lwd=getlwd(2))
+			weibull.lines(samples, params, useC, lty=mylty[plotCount], col=mycolors[plotCount], lwd=getlwd(plotCount))
 			df = rbind(df, c(title, "Weibull", paste.vector(params),
 							 retval$cross,
 							 paste(minus2l), paste(minus2l + 2*nParams), paste(minus2l + 2*nParams*sampleSize/(sampleSize - nParams - 1)),
 							 paste(minus2l + 2*nParams*log(log(sampleSize))), paste(minus2l + nParams*log(sampleSize)), paste(elapsed), paste(errorRatio)),
 					   stringsAsFactors=FALSE)
+			plotCount = plotCount + 1;
 
 			elapsed = system.time({ retval = norm.infer(samples, useC) })["elapsed"]
 			results = retval$results;
@@ -172,12 +185,13 @@ generate.plots = function(fullDataset, zeroPositioning=FALSE, useC=FALSE, useMin
 			params = as.numeric(results[1:(length(results)-2)])
 			nParams = length(params)
 			minus2l = -2*results["value"]
-			norm.lines(samples, params, useC, lty=mylty[3], col=mycolors[3], lwd=getlwd(3))
+			norm.lines(samples, params, useC, lty=mylty[plotCount], col=mycolors[plotCount], lwd=getlwd(plotCount))
 			df = rbind(df, c(title, "Normal", paste.vector(params),
 							 retval$cross,
 							 paste(minus2l), paste(minus2l + 2*nParams), paste(minus2l + 2*nParams*sampleSize/(sampleSize - nParams - 1)),
 							 paste(minus2l + 2*nParams*log(log(sampleSize))), paste(minus2l + nParams*log(sampleSize)), paste(elapsed), paste(errorRatio)),
 					   stringsAsFactors=FALSE)
+			plotCount = plotCount + 1;
 
 			elapsed = system.time({ retval = tnorm.infer(samples, useC) })["elapsed"]
 			results = retval$results;
@@ -185,15 +199,31 @@ generate.plots = function(fullDataset, zeroPositioning=FALSE, useC=FALSE, useMin
 			params = as.numeric(results[1:(length(results)-2)])
 			nParams = length(params)
 			minus2l = -2*results["value"]
-			tnorm.lines(samples, params, useC, lty=mylty[4], col=mycolors[4], lwd=getlwd(4))
+			tnorm.lines(samples, params, useC, lty=mylty[plotCount], col=mycolors[plotCount], lwd=getlwd(plotCount))
 			df = rbind(df, c(title, "T.Normal", paste.vector(params),
 							 retval$cross,
 							 paste(minus2l), paste(minus2l + 2*nParams), paste(minus2l + 2*nParams*sampleSize/(sampleSize - nParams - 1)),
 							 paste(minus2l + 2*nParams*log(log(sampleSize))), paste(minus2l + nParams*log(sampleSize)), paste(elapsed), paste(errorRatio)),
 					   stringsAsFactors=FALSE)
+			plotCount = plotCount + 1;
 
-			legend("topright", unname(unlist(df["model"]))[1:4], lty=mylty[1:4], col=mycolors[1:4], lwd=getlwd(1:4), seg.len=5);
+			elapsed = system.time({ retval = ollgengamma.infer(samples, useC) })["elapsed"]
+			results = retval$results;
+			results = results[nrow(results),]
+			params = as.numeric(results[1:(length(results)-2)])
+			nParams = length(params)
+			minus2l = -2*results["value"]
+			ollgengamma.lines(samples, params, useC, lty=mylty[plotCount], col=mycolors[plotCount], lwd=getlwd(plotCount))
+			df = rbind(df, c(title, "OLL-GenGamma", paste.vector(params),
+							 retval$cross,
+							 paste(minus2l), paste(minus2l + 2*nParams), paste(minus2l + 2*nParams*sampleSize/(sampleSize - nParams - 1)),
+							 paste(minus2l + 2*nParams*log(log(sampleSize))), paste(minus2l + nParams*log(sampleSize)), paste(elapsed), paste(errorRatio)),
+					   stringsAsFactors=FALSE)
+			plotCount = plotCount + 1;
+
+			legend("topright", unname(unlist(df["model"]))[1:5], lty=mylty[1:5], col=mycolors[1:5], lwd=getlwd(1:5), seg.len=5);
 			samples.hist(samples, xmin=histMinX)
+			plotCount = 1;
 
 			elapsed = system.time({ retval = kwcwg.infer(samples, useC) })["elapsed"]
 			results = retval$results;
@@ -201,12 +231,13 @@ generate.plots = function(fullDataset, zeroPositioning=FALSE, useC=FALSE, useMin
 			params = as.numeric(results[1:(length(results)-2)])
 			nParams = length(params)
 			minus2l = -2*results["value"]
-			kwcwg.lines(samples, params, useC, lty=mylty[1], col=mycolors[1], lwd=getlwd(2))
+			kwcwg.lines(samples, params, useC, lty=mylty[plotCount], col=mycolors[plotCount], lwd=getlwd(plotCount))
 			df = rbind(df, c(title, "KW-CWG", paste.vector(params),
 							 retval$cross,
 							 paste(minus2l), paste(minus2l + 2*nParams), paste(minus2l + 2*nParams*sampleSize/(sampleSize - nParams - 1)),
 							 paste(minus2l + 2*nParams*log(log(sampleSize))), paste(minus2l + nParams*log(sampleSize)), paste(elapsed), paste(errorRatio)),
 					   stringsAsFactors=FALSE)
+			plotCount = plotCount + 1;
 
 			elapsed = system.time({ retval = gengamma.infer(samples, useC) })["elapsed"]
 			results = retval$results;
@@ -214,12 +245,13 @@ generate.plots = function(fullDataset, zeroPositioning=FALSE, useC=FALSE, useMin
 			params = as.numeric(results[1:(length(results)-2)])
 			nParams = length(params)
 			minus2l = -2*results["value"]
-			gengamma.lines(samples, params, useC, lty=mylty[2], col=mycolors[2], lwd=getlwd(2))
+			gengamma.lines(samples, params, useC, lty=mylty[plotCount], col=mycolors[plotCount], lwd=getlwd(plotCount))
 			df = rbind(df, c(title, "G.Gamma", paste.vector(params),
 							 retval$cross,
 							 paste(minus2l), paste(minus2l + 2*nParams), paste(minus2l + 2*nParams*sampleSize/(sampleSize - nParams - 1)),
 							 paste(minus2l + 2*nParams*log(log(sampleSize))), paste(minus2l + nParams*log(sampleSize)), paste(elapsed), paste(errorRatio)),
 					   stringsAsFactors=FALSE)
+			plotCount = plotCount + 1;
 
 			elapsed = system.time({ retval = expweibull.infer(samples, useC) })["elapsed"]
 			results = retval$results;
@@ -227,12 +259,13 @@ generate.plots = function(fullDataset, zeroPositioning=FALSE, useC=FALSE, useMin
 			params = as.numeric(results[1:(length(results)-2)])
 			nParams = length(params)
 			minus2l = -2*results["value"]
-			expweibull.lines(samples, params, useC, lty=mylty[3], col=mycolors[3], lwd=getlwd(3))
+			expweibull.lines(samples, params, useC, lty=mylty[plotCount], col=mycolors[plotCount], lwd=getlwd(plotCount))
 			df = rbind(df, c(title, "E.Weibull", paste.vector(params),
 							 retval$cross,
 							 paste(minus2l), paste(minus2l + 2*nParams), paste(minus2l + 2*nParams*sampleSize/(sampleSize - nParams - 1)),
 							 paste(minus2l + 2*nParams*log(log(sampleSize))), paste(minus2l + nParams*log(sampleSize)), paste(elapsed), paste(errorRatio)),
 					   stringsAsFactors=FALSE)
+			plotCount = plotCount + 1;
 
 			print(df, width=150)
 			write.csv(df, file=paste(dataset$fileroot, "-", psize, ".csv", sep=""))
