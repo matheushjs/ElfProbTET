@@ -1,4 +1,4 @@
-allDirs="bfgs-estimate-c bfgs-subtract-min bfgs-subtract-estimated-min bfgs-no-subtract-c"
+allDirs="bfgs-estimate-c bfgs-subtract-first-estimated-min bfgs-raw-data bfgs-zero-positioned";
 
 for dir in $allDirs; do
 	ofile="$dir".csv
@@ -14,7 +14,7 @@ for dir in $allDirs; do
 
 	ofile="$dir".pdf
 	files="$(ls $dir/*.png)"
-	magick $files $ofile
+	convert $files $ofile
 done
 
 arr=($allDirs)
