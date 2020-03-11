@@ -1,7 +1,8 @@
-#require(rmutil)
+require(rmutil)
 
 source("myoptim.r")
 
+# Parameters are shape s > 0, scale m > 0, family f > 0
 # @param useC Tells us to also estimate parameter C, which is the amount to subtract from the samples.
 expweibull.infer = function(samples, useC=FALSE){
 	estimatedC    = min(samples) * 0.995
@@ -10,21 +11,15 @@ expweibull.infer = function(samples, useC=FALSE){
 	likelihood = function(ourSamples, params, C=0){
 		ourSamples = ourSamples - C;
 
-		# dgweibull does not accept a sample of value 0, so we fix this here
-		isZero = which(ourSamples == 0)
-		if(sum(isZero) > 0)
-			ourSamples[isZero] = min(ourSamples[-isZero])
-
-		# shape s > 0, scale m > 0, family f > 0
-		allLogs = rmutil::dgweibull(ourSamples, s=params[1], m=params[2], f=params[3], log=TRUE)
-
-		problems = which(!is.finite(allLogs))
-		if(length(problems) > 0 && length(problems) <= 5){
-			allLogs[problems] = min(allLogs[-problems]) + log(G_PENALIZATION_FACTOR) # P(X = x) = Pmin * 10^2
+		# dgweibull does not accept a sample of value 0
+		retval = try(rmutil::dgweibull(ourSamples[ourSamples > 0], s=params[1], m=params[2], f=params[3], log=TRUE));
+		if(is.list(retval)){
+			allLogs = retval;
 		} else {
-			allLogs[problems] = log(1e-300)
+			allLogs = rep(log(0), length(ourSamples));
 		}
 
+		problems = which(!is.finite(allLogs))
 		if(length(problems) > 0 && length(problems) < 5){
 			warning(paste("expweibul: Low amount (<5) of warnings at points:", ourSamples[problems]), call.=FALSE)
 		}
@@ -108,7 +103,9 @@ expweibull.lines = function(samples, params, useC=FALSE, ...){
 
 	x = seq(minVal, maxVal, length=1000)
 	x[x <= 1e-10] = 1e-10
-	y = rmutil::dgweibull(x, s=params[1], m=params[2], f=params[3])
+	y = try(rmutil::dgweibull(x, s=params[1], m=params[2], f=params[3]));
+	if(!is.list(y))
+		y = rep(0, length(x));
 
 	if(useC)
 		x = x + params[length(params)]

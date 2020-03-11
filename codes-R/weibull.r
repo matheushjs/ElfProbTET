@@ -11,19 +11,9 @@ weibull.infer = function(samples, useC=FALSE){
 	likelihood = function(ourSamples, params, C=0){
 		ourSamples = ourSamples - C
 
-		isZero = which(ourSamples == 0)
-		if(sum(isZero) > 0)
-			ourSamples[isZero] = min(ourSamples[-isZero])
-
 		allLogs = dweibull(ourSamples, shape=params[1], scale=params[2], log=TRUE)
 
 		problems = which(!is.finite(allLogs))
-		if(length(problems) > 0 && length(problems) <= 5){
-			allLogs[problems] = min(allLogs[-problems]) + log(G_PENALIZATION_FACTOR) # P(X = x) = Pmin * 10^2
-		} else {
-			allLogs[problems] = log(1e-300)
-		}
-
 		if(length(problems) > 0 && length(problems) < 5){
 			warning(paste("weibull: Low amount (<5) of warnings at points:", ourSamples[problems]), call.=FALSE)
 		}

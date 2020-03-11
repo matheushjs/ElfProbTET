@@ -10,20 +10,10 @@ gengamma.infer = function(samples, useC=FALSE){
 	likelihood = function(ourSamples, params, C=0){
 		ourSamples = ourSamples - C
 
-		isZero = which(ourSamples == 0)
-		if(sum(isZero) > 0)
-			ourSamples[isZero] = min(ourSamples[-isZero])
-
 		# shape > 0, scale > 0, k > 0
-		allLogs = dggamma(ourSamples, a=params[1], b=params[2], k=params[3], log=TRUE)
+		allLogs = ggamma::dggamma(ourSamples, a=params[1], b=params[2], k=params[3], log=TRUE)
 
 		problems = which(!is.finite(allLogs))
-		if(length(problems) > 0 && length(problems) <= 5){
-			allLogs[problems] = min(allLogs[-problems]) + log(G_PENALIZATION_FACTOR) # P(X = x) = Pmin * 10^2
-		} else {
-			allLogs[problems] = log(1e-300)
-		}
-
 		if(length(problems) > 0 && length(problems) < 5){
 			warning(paste("gengamma: Low amount (<5) of warnings at points:", ourSamples[problems]), call.=FALSE)
 		}
@@ -106,7 +96,7 @@ gengamma.lines = function(samples, params, useC=FALSE, ...){
 	}
 
 	x = seq(minVal, maxVal, length=1000)
-	y = dggamma(x, a=params[1], b=params[2], k=params[3])
+	y = ggamma::dggamma(x, a=params[1], b=params[2], k=params[3])
 	
 	if(useC)
 		x = x + params[length(params)]

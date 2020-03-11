@@ -11,12 +11,6 @@ norm.infer = function(samples, useC=FALSE){
 		allLogs = dnorm(ourSamples, mean=params[1], sd=params[2], log=T)
 
 		problems = which(!is.finite(allLogs))
-		if(length(problems) > 0 && length(problems) <= 5){
-			allLogs[problems] = min(allLogs[-problems]) + log(G_PENALIZATION_FACTOR) # P(X = x) = Pmin * 10^2
-		} else {
-			allLogs[problems] = log(1e-300)
-		}
-
 		if(length(problems) > 0 && length(problems) < 5){
 			warning(paste("norm: Low amount (<5) of warnings at points:", ourSamples[problems]), call.=FALSE)
 		}

@@ -10,20 +10,10 @@ ollgengamma.infer = function(samples, useC=FALSE){
 	likelihood = function(ourSamples, params, C=0){
 		ourSamples = ourSamples - C
 
-		isZero = which(ourSamples == 0)
-		if(sum(isZero) > 0)
-			ourSamples[isZero] = min(ourSamples[-isZero])
-
 		# shape > 0, scale > 0, k > 0, lambda > 0
 		allLogs = dollggamma(ourSamples, a=params[1], b=params[2], k=params[3], lambda=params[4], log=TRUE)
 
 		problems = which(!is.finite(allLogs))
-		if(length(problems) > 0 && length(problems) <= 5){
-			allLogs[problems] = min(allLogs[-problems]) + log(G_PENALIZATION_FACTOR) # P(X = x) = Pmin * 10^2
-		} else {
-			allLogs[problems] = log(1e-300)
-		}
-
 		if(length(problems) > 0 && length(problems) < 5){
 			warning(paste("oll-gengamma: Low amount (<5) of warnings at points:", ourSamples[problems]), call.=FALSE)
 		}

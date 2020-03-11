@@ -1,8 +1,5 @@
 require(viridis)
 
-# Global variables
-G_PENALIZATION_FACTOR = NA;
-
 source("./kwcwg.r")
 source("./weibull.r")
 source("./gamma.r")
