@@ -169,6 +169,7 @@ kwcwg.lines = function(samples, params, useC=FALSE, ...){
 
 	x = seq(minVal, maxVal, length=1000)
 	y = dkwcwg(x, params[1], params[2], params[3], params[4], params[5])
+	y[!is.finite(y)] = 0;
 	
 	if(useC)
 		x = x + params[length(params)]

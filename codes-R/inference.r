@@ -148,7 +148,7 @@ generate.plots = function(fullDataset, zeroPositioning=FALSE, useC=FALSE, useMin
 			plotCount = 1;
 
 			title = paste(capitalize(dataset$algorithm), capitalize(dataset$machine), psize, sep="-")
-			title(title, side = 3, line = -3, outer = TRUE)
+			title(title, line = -3, outer = TRUE)
 
 			elapsed = system.time({ retval = gamma.infer(samples, useC) })["elapsed"]
 			results = retval$results;

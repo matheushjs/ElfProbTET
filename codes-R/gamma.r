@@ -100,6 +100,7 @@ gamma.lines = function(samples, params, useC=FALSE, ...){
 
 	x = seq(minVal, maxVal, length=1000)
 	y = dgamma(x, shape=params[1], scale=params[2])
+	y[!is.finite(y)] = 0;
 
 	if(useC)
 		x = x + params[length(params)]

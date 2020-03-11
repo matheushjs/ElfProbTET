@@ -97,6 +97,7 @@ gengamma.lines = function(samples, params, useC=FALSE, ...){
 
 	x = seq(minVal, maxVal, length=1000)
 	y = ggamma::dggamma(x, a=params[1], b=params[2], k=params[3])
+	y[!is.finite(y)] = 0;
 	
 	if(useC)
 		x = x + params[length(params)]
