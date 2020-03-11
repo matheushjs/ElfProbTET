@@ -12,7 +12,7 @@ lnorm.infer = function(samples, useC=FALSE){
 
 		problems = which(!is.finite(allLogs))
 		if(length(problems) > 0 && length(problems) <= 5){
-			allLogs[problems] = min(allLogs[-problems])
+			allLogs[problems] = min(allLogs[-problems]) + log(G_PENALIZATION_FACTOR) # P(X = x) = Pmin * 10^2
 		} else {
 			allLogs[problems] = log(1e-300)
 		}
