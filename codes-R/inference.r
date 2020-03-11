@@ -1,7 +1,7 @@
 require(viridis)
 
 # Global variables
-G_PENALIZATION_FACTOR = 0.01;
+G_PENALIZATION_FACTOR = NA;
 
 source("./kwcwg.r")
 source("./weibull.r")
@@ -144,6 +144,7 @@ generate.plots = function(fullDataset, zeroPositioning=FALSE, useC=FALSE, useMin
 				histMinX = 0
 			}
 
+			graphics.off();
 			dev.new(width=1*12, height=1*6)
 			par(mfrow=c(1, 2));
 			samples.hist(samples, xmin=histMinX)
