@@ -14,6 +14,7 @@ ollgengamma.infer = function(samples, useC=FALSE){
 		allLogs = dollggamma(ourSamples, a=params[1], b=params[2], k=params[3], lambda=params[4], log=TRUE)
 
 		problems = which(!is.finite(allLogs))
+		allLogs[problems] = log(1e-300); # Merely to force optim to continue optimizing
 		if(length(problems) > 0 && length(problems) < 5){
 			warning(paste("oll-gengamma: Low amount (<5) of warnings at points:", ourSamples[problems]), call.=FALSE)
 		}

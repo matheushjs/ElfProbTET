@@ -11,6 +11,7 @@ lnorm.infer = function(samples, useC=FALSE){
 		allLogs = dlnorm(ourSamples, meanlog=params[1], sdlog=params[2], log=T)
 
 		problems = which(!is.finite(allLogs))
+		allLogs[problems] = log(1e-300); # Merely to force optim to continue optimizing
 		if(length(problems) > 0 && length(problems) < 5){
 			warning(paste("lognorm: Low amount (<5) of warnings at points:", ourSamples[problems]), call.=FALSE)
 		}

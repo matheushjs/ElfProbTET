@@ -13,6 +13,7 @@ tnorm.infer = function(samples, useC=FALSE){
 		allLogs = log(dtruncnorm(ourSamples, a=0, mean=params[1], sd=params[2]))
 
 		problems = which(!is.finite(allLogs))
+		allLogs[problems] = log(1e-300); # Merely to force optim to continue optimizing
 		if(length(problems) > 0 && length(problems) < 5){
 			warning(paste("norm: Low amount (<5) of warnings at points:", ourSamples[problems]), call.=FALSE)
 		}

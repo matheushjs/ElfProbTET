@@ -14,6 +14,7 @@ weibull.infer = function(samples, useC=FALSE){
 		allLogs = dweibull(ourSamples, shape=params[1], scale=params[2], log=TRUE)
 
 		problems = which(!is.finite(allLogs))
+		allLogs[problems] = log(1e-300); # Merely to force optim to continue optimizing
 		if(length(problems) > 0 && length(problems) < 5){
 			warning(paste("weibull: Low amount (<5) of warnings at points:", ourSamples[problems]), call.=FALSE)
 		}
