@@ -1,11 +1,11 @@
-#require(rmutil)
+require(rmutil)
 
-dgweibull = function(x, k, lambda, alpha, log=F){
-	val = alpha * k * (x / lambda)**(k-1) / lambda * (1 - exp(-(x / lambda)**k))**(alpha-1) * exp(-(x/lambda)**k);
-	if(log)
-		val = log(val);
-	val;
-}
+#dgweibull = function(x, k, lambda, alpha, log=F){
+#	val = alpha * k * (x / lambda)**(k-1) / lambda * (1 - exp(-(x / lambda)**k))**(alpha-1) * exp(-(x/lambda)**k);
+#	if(log)
+#		val = log(val);
+#	val;
+#}
 
 source("myoptim.r")
 
@@ -20,7 +20,7 @@ expweibull.infer = function(samples, useC=FALSE){
 
 		# dgweibull does not accept a sample of value 0
 		allLogs = rep(log(1e-300), length(ourSamples));
-		retval = try(dgweibull(ourSamples[ourSamples > 0], k=params[1], lambda=params[2], alpha=params[3], log=TRUE));
+		retval = try(rmutil::dgweibull(ourSamples[ourSamples > 0], s=params[1], m=params[2], f=params[3], log=TRUE));
 		if(is.numeric(retval))
 			allLogs[ourSamples > 0] = retval;
 
@@ -109,7 +109,7 @@ expweibull.lines = function(samples, params, useC=FALSE, ...){
 
 	x = seq(minVal, maxVal, length=1000)
 	x[x <= 1e-10] = 1e-10
-	y = try(dgweibull(x, k=params[1], lambda=params[2], alpha=params[3]));
+	y = try(rmutil::dgweibull(x, s=params[1], m=params[2], f=params[3]));
 	if(!is.numeric(y))
 		y = rep(0, length(x));
 
