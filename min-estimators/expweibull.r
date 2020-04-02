@@ -1,12 +1,5 @@
 require(rmutil)
 
-#dgweibull = function(x, k, lambda, alpha, log=F){
-#	val = alpha * k * (x / lambda)**(k-1) / lambda * (1 - exp(-(x / lambda)**k))**(alpha-1) * exp(-(x/lambda)**k);
-#	if(log)
-#		val = log(val);
-#	val;
-#}
-
 source("myoptim.r")
 
 # Parameters are shape s > 0, scale m > 0, family f > 0
