@@ -1,4 +1,6 @@
 
+source("myoptim.r")
+
 InfModel = function(
 	name,          # = "Gamma"
 	paramNames,    # = c("shape", "scale")
@@ -25,14 +27,102 @@ InfModel = function(
 # Generic for inference
 infer = function(x) UseMethod("infer")
 
-infer.InfModel = function(samples, useC=FALSE){
+infer.InfModel = function(model, samples, useC=FALSE){
+	estimatedC = min(samples) * 0.995;
 
+	# The likelihood function
+	likelihood = function(ourSamples, params, C=0){
+		ourSamples = ourSamples - C;
+
+		# dgweibull does not accept a sample of value 0
+		allLogs = model$param_pdf(ourSamples, params, log=TRUE);
+
+		problems = which(!is.finite(allLogs))
+		allLogs[problems] = log(1e-300); # Merely to force optim to continue optimizing
+		if(length(problems) > 0 && length(problems) < 5){
+			warning(paste(model$name, ": Low amount (<5) of warnings at points:", ourSamples[problems]), call.=FALSE)
+		}
+
+		theSum = -sum(allLogs) # Invert so that minimization yields a maximum
+		
+		return(theSum)
+	}
+
+	retval = NULL
+
+	if(useC){
+		model$paramNames = c(model$paramNames, "c");
+		model$lowerBounds = c(model$lowerBounds, 1e-10);
+		model$upperBounds = c(model$upperBounds, min(samples) - 1e-10);
+		model$initialParams[[length(model$initialParams) + 1]] = c(estimatedC);
+	}
+
+	# Recursive function to iterate over the initial parameters
+	func = function(initialParams, curParams, curIdx){
+		if(curIdx > length(initialParams)){
+			print(curParams);
+
+			if(useC == FALSE){
+				result = myoptim(curParams, function(p) likelihood(samples, p),
+								 lower=model$lowerBounds, upper=model$upperBounds, method="L-BFGS-B");
+			} else {
+				result = myoptim(curParams, function(p) likelihood(samples, p, p[length(p)]),
+								 lower=model$lowerBounds, upper=model$upperBounds, method="L-BFGS-B");
+			}
+			
+			params = result$par;
+			val = -result$value; # Undo signal invertion in the likelihood function
+			convergence = result$convergence;
+			# cat("Got params:", params, "\n")
+
+			retval = rbind(retval, c(params, val, convergence));
+		} else {
+			for(p in initialParams[[curIdx]])
+				func(initialParams, c(curParams, p), curIdx+1);
+		}
+	}
+
+	retval = as.data.frame(retval);
+	colnames(retval) = c(model$paramNames, "value", "convergence")
+
+	# We sort it by value
+	sortedIdx = sort.list(retval$value, decreasing=FALSE);
+	retval = retval[sortedIdx,];
+
+	# Now perform cross validation using the best parameters as initial conditions
+	bestResult = retval[nrow(retval),];
+	params = bestResult[1,1:length(model$paramNames)];
+	cross  = cross.validation(params, samples, likelihood, useC=useC,
+							  lower=model$lowerBounds, upper=model$upperBounds, method="L-BFGS-B");
+
+	return(list(results=retval, cross=cross));
 }
 
 # Lines is already a generic
-lines.InfModel = function(samples, params, useC=FALSE, ...){
+lines.InfModel = function(model, samples, params, useC=FALSE, ...){
+	delta = diff(quantile(samples, c(0.05, 0.95)));
+	minVal = min(samples) - 0.95*delta;
+	maxVal = max(samples) + 1.05*delta;
+	
+	if(minVal <= 0)
+		minVal = 1e-100;
 
+	if(useC){
+		minVal = minVal - params[length(params)];
+		maxVal = maxVal - params[length(params)];
+	}
+
+	x = seq(minVal, maxVal, length=1000);
+	x[x <= 1e-10] = 1e-10;
+	y = model$param_pdf(x, params);
+	if(!is.numeric(y))
+		y = rep(0, length(x));
+
+	if(useC)
+		x = x + params[length(params)];
+
+	lines(x, y, ...);
 }
 
 # For debugging:
-# model = InfModel("Gamma", c("shape", "scale"), c(1-10, 1-10), c(Inf, Inf), list(0.02, 0.02), function(p, ...) dgamma(shape=p[1], shape=p[2], ...))
+model = InfModel("Gamma", c("shape", "scale"), c(1-10, 1-10), c(Inf, Inf), list(0.02, 0.02), function(p, ...) dgamma(shape=p[1], shape=p[2], ...))
