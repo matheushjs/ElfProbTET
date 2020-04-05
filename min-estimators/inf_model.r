@@ -7,7 +7,7 @@ InfModel = function(
 	lowerBounds,   # = c(1e-10, 1e-10)
 	upperBounds,   # = c(Inf, Inf)
 	initialParams, # = list(c(0.02, 0.5, 2, 5, 10), c(0.02, 0.5, 2, 5, 10))
-	param_pdf      # = function(p, ...) dgamma(shape=p[1], scale=p[2], ...)
+	param_pdf      # = function(samples, p, ...) dgamma(samples, shape=p[1], scale=p[2], ...)
 ){
 	if(!is.character(name)) stop("name must be string.");
 	if(!is.character(paramNames)) stop("paramNames must be string.");
@@ -25,7 +25,7 @@ InfModel = function(
 };
 
 # Generic for inference
-infer = function(x) UseMethod("infer")
+infer = function(x, ...) UseMethod("infer")
 
 infer.InfModel = function(model, samples, useC=FALSE){
 	estimatedC = min(samples) * 0.995;
@@ -48,7 +48,7 @@ infer.InfModel = function(model, samples, useC=FALSE){
 		return(theSum)
 	}
 
-	retval = NULL
+	retval = NULL;
 
 	if(useC){
 		model$paramNames = c(model$paramNames, "c");
@@ -75,12 +75,14 @@ infer.InfModel = function(model, samples, useC=FALSE){
 			convergence = result$convergence;
 			# cat("Got params:", params, "\n")
 
-			retval = rbind(retval, c(params, val, convergence));
+			# Access to parent scope
+			retval <<- rbind(retval, c(params, val, convergence));
 		} else {
 			for(p in initialParams[[curIdx]])
 				func(initialParams, c(curParams, p), curIdx+1);
 		}
 	}
+	func(model$initialParams, NULL, 1);
 
 	retval = as.data.frame(retval);
 	colnames(retval) = c(model$paramNames, "value", "convergence")
