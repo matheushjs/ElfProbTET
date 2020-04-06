@@ -9,24 +9,6 @@ source("inf_model.r");
 allModels = function(samples){
 	list(
 		InfModel(
-			name        = "ExpWeibull",
-			paramNames  = c("shape", "scale", "family"),
-			lowerBounds = c(1e-10, 1e-10, 1e-10),
-			upperBounds = c(Inf, Inf, Inf),
-			initialParams = list(c(0.02, 0.5, 2, 5, 10),
-								 c(0.02, 0.5, 2, 5, 10),
-								 c(0.02, 0.5, 2, 5, 10)),
-			param_pdf = function(samples, p, log, ...){
-				allLogs = rep(log(1e-300), length(samples));
-				retval = try(rmutil::dgweibull(samples, s=p[1], m=p[2], f=p[3], log=log, ...));
-				if(is.numeric(retval))
-					allLogs[samples > 0] = retval;
-				if(log == FALSE)
-					allLogs = exp(allLogs);
-				allLogs;
-			}
-		),
-		InfModel(
 			name        = "Gamma",
 			paramNames  = c("shape", "scale"),
 			lowerBounds = c(1e-10, 1e-10),
@@ -69,21 +51,11 @@ allModels = function(samples){
 			upperBounds = c(Inf, Inf),
 			initialParams = list(mean(samples) * c(0.666, 1, 1.5),
 			                     sd(samples) * c(0.666, 1, 1.5)),
-			param_pdf = function(samples, p, log, ...){
+			param_pdf = function(samples, p, log=FALSE, ...){
 				res = dtruncnorm(samples, a=0, mean=p[1], sd=p[2], ...);
 				if(log) res = log(res);
 				res;
 			}
-		),
-		InfModel(
-			name        = "G.Gamma",
-			paramNames  = c("shape", "scale", "k"),
-			lowerBounds = c(1e-7, 1e-7, 1e-7),
-			upperBounds = c(Inf, Inf, Inf),
-			initialParams = list(c(0.5, 2, 5, 10),
-			                     c(0.5, 2, 5, 10),
-			                     c(0.5, 2, 5, 10)),
-			param_pdf = function(samples, p, ...) ggamma::dggamma(samples, a=p[1], b=p[2], k=p[3], ...)
 		),
 		InfModel(
 			name        = "Kw-CWG",
@@ -100,13 +72,41 @@ allModels = function(samples){
 		InfModel(
 			name        = "OLL-GG",
 			paramNames  = c("a", "b", "k", "lambda"),
-			lowerBounds = c(1e-7, 1e-7, 1e-7, 1e-7, 1e-7),
+			lowerBounds = c(1e-7, 1e-7, 1e-7, 1e-7),
 			upperBounds = c(Inf, Inf, Inf, Inf),
 			initialParams = list(c(0.5, 2, 5),
 			                     c(0.5, 2, 5),
 			                     c(0.5, 5),
 			                     c(0.25, 1.5)),
 			param_pdf = function(samples, p, ...) dollggamma(samples, a=p[1], b=p[2], k=p[3], lambda=p[4], ...)
+		),
+		InfModel(
+			name        = "G.Gamma",
+			paramNames  = c("shape", "scale", "k"),
+			lowerBounds = c(1e-7, 1e-7, 1e-7),
+			upperBounds = c(Inf, Inf, Inf),
+			initialParams = list(c(0.5, 2, 5, 10),
+			                     c(0.5, 2, 5, 10),
+			                     c(0.5, 2, 5, 10)),
+			param_pdf = function(samples, p, ...) ggamma::dggamma(samples, a=p[1], b=p[2], k=p[3], ...)
+		),
+		InfModel(
+			name        = "E.Weibull",
+			paramNames  = c("shape", "scale", "family"),
+			lowerBounds = c(1e-10, 1e-10, 1e-10),
+			upperBounds = c(Inf, Inf, Inf),
+			initialParams = list(c(0.02, 0.5, 2, 5, 10),
+								 c(0.02, 0.5, 2, 5, 10),
+								 c(0.02, 0.5, 2, 5, 10)),
+			param_pdf = function(samples, p, log=FALSE, ...){
+				allLogs = rep(log(1e-300), length(samples));
+				retval = try(rmutil::dgweibull(samples, s=p[1], m=p[2], f=p[3], log=TRUE, ...));
+				if(is.numeric(retval))
+					allLogs[samples > 0] = retval;
+				if(log == FALSE)
+					allLogs = exp(allLogs);
+				allLogs;
+			}
 		)
 	);
 }
