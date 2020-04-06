@@ -78,7 +78,11 @@ infer.InfModel = function(model, samples, useC=FALSE){
 			# Access to parent scope
 			retval <<- rbind(retval, c(params, val, convergence));
 		} else {
-			for(p in initialParams[[curIdx]])
+			initParams = initialParams[[curIdx]];
+			if(is.function(initParams))
+				initParams = initParams(curParams);
+			
+			for(p in initParams)
 				func(initialParams, c(curParams, p), curIdx+1);
 		}
 	}
