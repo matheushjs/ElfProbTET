@@ -1,14 +1,6 @@
 require(viridis)
 
-source("./kwcwg.r")
-source("./weibull.r")
-source("./gamma.r")
-source("./tnorm.r")
-source("./norm.r")
-source("./gengamma.r")
-source("./expweibull.r")
-source("./ollggamma.r")
-source("./lnorm.r")
+source("./allModels.r");
 
 # Returns the sample sets in each file
 # Each file has 1000 samples for each experiment made, so each sample set has 1000 entries
@@ -150,143 +142,38 @@ generate.plots = function(fullDataset, zeroPositioning=FALSE, useC=FALSE, useMin
 			title = paste(capitalize(dataset$algorithm), capitalize(dataset$machine), psize, sep="-")
 			title(title, line = -3, outer = TRUE)
 
-			elapsed = system.time({ retval = gamma.infer(samples, useC) })["elapsed"]
-			results = retval$results;
-			results = results[nrow(results),]
-			params = as.numeric(results[1:(length(results)-2)])
-			nParams = length(params)
-			errors = results["convergence"] != 0
-			errorRatio = sum(errors) / length(errors)
-			minus2l = -2*results["value"]
-			gamma.lines(samples, params, useC, lty=mylty[plotCount], col=mycolors[plotCount], lwd=getlwd(plotCount))
-			df = rbind(df, c(title, "Gamma", paste.vector(params),
-							 retval$cross,
-							 paste(minus2l), paste(minus2l + 2*nParams), paste(minus2l + 2*nParams*sampleSize/(sampleSize - nParams - 1)),
-							 paste(minus2l + 2*nParams*log(log(sampleSize))), paste(minus2l + nParams*log(sampleSize)), paste(elapsed), paste(errorRatio)),
-					   stringsAsFactors=FALSE)
-			plotCount = plotCount + 1;
-			colnames(df) = c("title", "model", "estimates", "crossValid", "-2l", "AIC", "CAIC", "BIC", "HQIC", "elapsed.time", "optErrorRatio")
+			models = allModels(samples);
+			for(i in 1:length(models)){
+				model = models[[i]];
 
-			elapsed = system.time({ retval = weibull.infer(samples, useC) })["elapsed"]
-			results = retval$results;
-			results = results[nrow(results),]
-			params = as.numeric(results[1:(length(results)-2)])
-			nParams = length(params)
-			minus2l = -2*results["value"]
-			weibull.lines(samples, params, useC, lty=mylty[plotCount], col=mycolors[plotCount], lwd=getlwd(plotCount))
-			df = rbind(df, c(title, "Weibull", paste.vector(params),
-							 retval$cross,
-							 paste(minus2l), paste(minus2l + 2*nParams), paste(minus2l + 2*nParams*sampleSize/(sampleSize - nParams - 1)),
-							 paste(minus2l + 2*nParams*log(log(sampleSize))), paste(minus2l + nParams*log(sampleSize)), paste(elapsed), paste(errorRatio)),
-					   stringsAsFactors=FALSE)
-			plotCount = plotCount + 1;
+				elapsed = system.time({ retval = infer(model, samples, useC) })["elapsed"]
+				results = retval$results;
+				results = results[nrow(results),]
+				params = as.numeric(results[1:(length(results)-2)])
+				nParams = length(params)
+				errors = results["convergence"] != 0
+				errorRatio = sum(errors) / length(errors)
+				minus2l = -2*results["value"]
+				lines(model, samples, params, useC, lty=mylty[plotCount], col=mycolors[plotCount], lwd=getlwd(plotCount))
+				df = rbind(df, c(title, model$name, paste.vector(params),
+								 retval$cross,
+								 paste(minus2l), paste(minus2l + 2*nParams), paste(minus2l + 2*nParams*sampleSize/(sampleSize - nParams - 1)),
+								 paste(minus2l + 2*nParams*log(log(sampleSize))), paste(minus2l + nParams*log(sampleSize)), paste(elapsed), paste(errorRatio)),
+						   stringsAsFactors=FALSE)
+				plotCount = plotCount + 1;
 
-			elapsed = system.time({ retval = norm.infer(samples, useC) })["elapsed"]
-			results = retval$results;
-			results = results[nrow(results),]
-			params = as.numeric(results[1:(length(results)-2)])
-			nParams = length(params)
-			minus2l = -2*results["value"]
-			norm.lines(samples, params, useC, lty=mylty[plotCount], col=mycolors[plotCount], lwd=getlwd(plotCount))
-			df = rbind(df, c(title, "Normal", paste.vector(params),
-							 retval$cross,
-							 paste(minus2l), paste(minus2l + 2*nParams), paste(minus2l + 2*nParams*sampleSize/(sampleSize - nParams - 1)),
-							 paste(minus2l + 2*nParams*log(log(sampleSize))), paste(minus2l + nParams*log(sampleSize)), paste(elapsed), paste(errorRatio)),
-					   stringsAsFactors=FALSE)
-			plotCount = plotCount + 1;
+				colnames(df) = c("title", "model", "estimates", "crossValid", "-2l", "AIC", "CAIC", "BIC", "HQIC", "elapsed.time", "optErrorRatio")
 
-			elapsed = system.time({ retval = tnorm.infer(samples, useC) })["elapsed"]
-			results = retval$results;
-			results = results[nrow(results),]
-			params = as.numeric(results[1:(length(results)-2)])
-			nParams = length(params)
-			minus2l = -2*results["value"]
-			tnorm.lines(samples, params, useC, lty=mylty[plotCount], col=mycolors[plotCount], lwd=getlwd(plotCount))
-			df = rbind(df, c(title, "T.Normal", paste.vector(params),
-							 retval$cross,
-							 paste(minus2l), paste(minus2l + 2*nParams), paste(minus2l + 2*nParams*sampleSize/(sampleSize - nParams - 1)),
-							 paste(minus2l + 2*nParams*log(log(sampleSize))), paste(minus2l + nParams*log(sampleSize)), paste(elapsed), paste(errorRatio)),
-					   stringsAsFactors=FALSE)
-			plotCount = plotCount + 1;
-
-			elapsed = system.time({ retval = lnorm.infer(samples, useC) })["elapsed"]
-			results = retval$results;
-			results = results[nrow(results),]
-			params = as.numeric(results[1:(length(results)-2)])
-			nParams = length(params)
-			minus2l = -2*results["value"]
-			lnorm.lines(samples, params, useC, lty=mylty[plotCount], col=mycolors[plotCount], lwd=getlwd(plotCount))
-			df = rbind(df, c(title, "Lognormal", paste.vector(params),
-							 retval$cross,
-							 paste(minus2l), paste(minus2l + 2*nParams), paste(minus2l + 2*nParams*sampleSize/(sampleSize - nParams - 1)),
-							 paste(minus2l + 2*nParams*log(log(sampleSize))), paste(minus2l + nParams*log(sampleSize)), paste(elapsed), paste(errorRatio)),
-					   stringsAsFactors=FALSE)
-			plotCount = plotCount + 1;
-
-			legend("topright", unname(unlist(df["model"]))[1:5], lty=mylty[1:5], col=mycolors[1:5], lwd=getlwd(1:5), seg.len=5);
-			samples.hist(samples, xmin=histMinX)
-			plotCount = 1;
-
-			elapsed = system.time({ retval = ollgengamma.infer(samples, useC) })["elapsed"]
-			results = retval$results;
-			results = results[nrow(results),]
-			params = as.numeric(results[1:(length(results)-2)])
-			nParams = length(params)
-			minus2l = -2*results["value"]
-			ollgengamma.lines(samples, params, useC, lty=mylty[plotCount], col=mycolors[plotCount], lwd=getlwd(plotCount))
-			df = rbind(df, c(title, "OLL-GenGamma", paste.vector(params),
-							 retval$cross,
-							 paste(minus2l), paste(minus2l + 2*nParams), paste(minus2l + 2*nParams*sampleSize/(sampleSize - nParams - 1)),
-							 paste(minus2l + 2*nParams*log(log(sampleSize))), paste(minus2l + nParams*log(sampleSize)), paste(elapsed), paste(errorRatio)),
-					   stringsAsFactors=FALSE)
-			plotCount = plotCount + 1;
-
-			elapsed = system.time({ retval = kwcwg.infer(samples, useC) })["elapsed"]
-			results = retval$results;
-			results = results[nrow(results),]
-			params = as.numeric(results[1:(length(results)-2)])
-			nParams = length(params)
-			minus2l = -2*results["value"]
-			kwcwg.lines(samples, params, useC, lty=mylty[plotCount], col=mycolors[plotCount], lwd=getlwd(plotCount))
-			df = rbind(df, c(title, "KW-CWG", paste.vector(params),
-							 retval$cross,
-							 paste(minus2l), paste(minus2l + 2*nParams), paste(minus2l + 2*nParams*sampleSize/(sampleSize - nParams - 1)),
-							 paste(minus2l + 2*nParams*log(log(sampleSize))), paste(minus2l + nParams*log(sampleSize)), paste(elapsed), paste(errorRatio)),
-					   stringsAsFactors=FALSE)
-			plotCount = plotCount + 1;
-
-			elapsed = system.time({ retval = gengamma.infer(samples, useC) })["elapsed"]
-			results = retval$results;
-			results = results[nrow(results),]
-			params = as.numeric(results[1:(length(results)-2)])
-			nParams = length(params)
-			minus2l = -2*results["value"]
-			gengamma.lines(samples, params, useC, lty=mylty[plotCount], col=mycolors[plotCount], lwd=getlwd(plotCount))
-			df = rbind(df, c(title, "G.Gamma", paste.vector(params),
-							 retval$cross,
-							 paste(minus2l), paste(minus2l + 2*nParams), paste(minus2l + 2*nParams*sampleSize/(sampleSize - nParams - 1)),
-							 paste(minus2l + 2*nParams*log(log(sampleSize))), paste(minus2l + nParams*log(sampleSize)), paste(elapsed), paste(errorRatio)),
-					   stringsAsFactors=FALSE)
-			plotCount = plotCount + 1;
-
-			elapsed = system.time({ retval = expweibull.infer(samples, useC) })["elapsed"]
-			results = retval$results;
-			results = results[nrow(results),]
-			params = as.numeric(results[1:(length(results)-2)])
-			nParams = length(params)
-			minus2l = -2*results["value"]
-			expweibull.lines(samples, params, useC, lty=mylty[plotCount], col=mycolors[plotCount], lwd=getlwd(plotCount))
-			df = rbind(df, c(title, "E.Weibull", paste.vector(params),
-							 retval$cross,
-							 paste(minus2l), paste(minus2l + 2*nParams), paste(minus2l + 2*nParams*sampleSize/(sampleSize - nParams - 1)),
-							 paste(minus2l + 2*nParams*log(log(sampleSize))), paste(minus2l + nParams*log(sampleSize)), paste(elapsed), paste(errorRatio)),
-					   stringsAsFactors=FALSE)
-			plotCount = plotCount + 1;
+				if(plotCount == 6){
+					legend("topright", unname(unlist(df["model"]))[1:5], lty=mylty[1:5], col=mycolors[1:5], lwd=getlwd(1:5), seg.len=5);
+					samples.hist(samples, xmin=histMinX)
+					plotCount = 1;
+				}
+			}
+			legend("topright", unname(unlist(df["model"]))[6:9], lty=mylty[1:4], col=mycolors[1:4], lwd=getlwd(1:4), seg.len=5);
 
 			print(df, width=150)
 			write.csv(df, file=paste(dataset$fileroot, "-", psize, ".csv", sep=""))
-
-			legend("topright", unname(unlist(df["model"]))[6:9], lty=mylty[1:4], col=mycolors[1:4], lwd=getlwd(1:4), seg.len=5);
 
 			outputName = paste(dataset$fileroot, "-", psize, ".png", sep="")
 			savePlot(outputName, type="png")
