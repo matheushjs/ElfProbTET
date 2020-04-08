@@ -156,7 +156,7 @@ generate.plots = function(fullDataset, zeroPositioning=FALSE, useC=FALSE, useMin
 				minus2l = -2*results["value"]
 				lines(model, samples, params, useC, lty=mylty[plotCount], col=mycolors[plotCount], lwd=getlwd(plotCount))
 				df = rbind(df, c(title, model$name, paste.vector(params),
-								 retval$cross,
+								 -2*retval$cross,
 								 paste(minus2l), paste(minus2l + 2*nParams), paste(minus2l + 2*nParams*sampleSize/(sampleSize - nParams - 1)),
 								 paste(minus2l + 2*nParams*log(log(sampleSize))), paste(minus2l + nParams*log(sampleSize)), paste(elapsed), paste(errorRatio)),
 						   stringsAsFactors=FALSE)
