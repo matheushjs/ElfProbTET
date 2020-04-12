@@ -60,8 +60,6 @@ infer.InfModel = function(model, samples, useC=FALSE){
 	# Recursive function to iterate over the initial parameters
 	func = function(initialParams, curParams, curIdx){
 		if(curIdx > length(initialParams)){
-			print(curParams);
-
 			if(useC == FALSE){
 				result = myoptim(curParams, function(p) likelihood(samples, p),
 								 lower=model$lowerBounds, upper=model$upperBounds, method="L-BFGS-B");

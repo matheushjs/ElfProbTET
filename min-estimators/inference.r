@@ -112,6 +112,33 @@ samples.hist = function(samples, breaks=20, main="", xmin=NULL){
 # Process all files and save all plots
 # If zeroPositioning is TRUE, we subtract the lowest execution time from the sample, making the empirical distribution begin at zero.
 generate.plots = function(fullDataset, zeroPositioning=FALSE, useC=FALSE, useMinEstimator=FALSE){
+	# Research Questions:
+	# 1. Even if the model has a long left tail, wont the likelihood be higher if we use the c + X model?
+	# 2. If it is actually a c + X model, how to estimate c? Can we also achieve better likelihood?
+
+	# Cautions:
+	# 1. We assume the optimization finds the global maximum likelihood
+
+	for(i in 1:100){
+		data = rgamma(n=1000, shape=10, scale=10);
+		print(sum(dgamma(data, shape=10, scale=10, log=T)));
+
+		models = allModels(data);
+		res = infer(models[[1]], data);
+		print(res$results[nrow(res$results),"value"]);
+		print(res$cross);
+
+		factor = 1 - sd(data)/(mean(data) * log10(length(data)));
+		data = data - factor*min(data);
+		models = allModels(data);
+		res = infer(models[[1]], data);
+		print(res$results[nrow(res$results),"value"]);
+		print(res$cross);
+		print("======")
+	}
+
+	return();
+
 	for(i in 1:length(fullDataset)){
 		dataset = fullDataset[[i]]
 
