@@ -20,10 +20,10 @@ cross.validation = function(params, samples, likelihood, useC=F, folds=5, ...){
 
 		if(useC == FALSE){
 			result = myoptim(params, function(p) likelihood(train, p, C=0), ...);
-			testResults[i] = likelihood(test, result$par, C=0);
+			testResults[i] = -likelihood(test, result$par, C=0);
 		} else {
 			result = myoptim(params, function(p) likelihood(train, p, C=p[length(p)]), ...);
-			testResults[i] = likelihood(test, result$par, C=result$par[length(result$par)]);
+			testResults[i] = -likelihood(test, result$par, C=result$par[length(result$par)]);
 		}
 	}
 
