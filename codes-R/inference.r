@@ -111,6 +111,8 @@ samples.hist = function(samples, breaks=20, main="", xmin=NULL){
 
 # Process all files and save all plots
 # If zeroPositioning is TRUE, we subtract the lowest execution time from the sample, making the empirical distribution begin at zero.
+# @param zeroPositioning can be FALSE if data should not be subtracted from some estimated populational minimum.
+#                        otherwise it can be "c1", "c2", "c3", "c4" depending on the estimator you want to use.
 generate.plots = function(fullDataset, zeroPositioning=FALSE, useC=FALSE, useMinEstimator=FALSE){
 	for(i in 1:length(fullDataset)){
 		dataset = fullDataset[[i]]
@@ -122,15 +124,16 @@ generate.plots = function(fullDataset, zeroPositioning=FALSE, useC=FALSE, useMin
 			df = data.frame()
 			histMinX = NULL
 
-			if(zeroPositioning){
-				if(useMinEstimator){
-					factor = 1 - sd(samples)/(mean(samples) * log10(sampleSize))
-				} else {
-					factor = 1
-				}
-				samples = samples - factor*min(samples)
-				cat("factor: ", factor, "\n")
+			if(is.character(zeroPositioning)){
+				hatMin = switch(zeroPositioning,
+					c1 = min(samples) - abs(min(samples) * sd(samples) / mean(samples)) / log10(sampleSize),
+					c2 = min(samples) - sd(samples) / log10(sampleSize),
+					c3 = min(samples) - sd(samples) * sqrt(log(log(n)) / (2*sampleSize)),
+					c4 = min(samples) - sd(samples) * sqrt(-log(0.05/2) / (2*sampleSize))
+					)
 				histMinX = 0
+				samples = samples - hatMin;
+				cat("hatMin: ", hatMin, "\n")
 			}
 
 			graphics.off();
