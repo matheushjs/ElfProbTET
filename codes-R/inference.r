@@ -24,15 +24,56 @@ paste.vector = function(vec){
 
 #mycolors = inferno(100)[c(1, 25, 45, 66, 95)];
 mycolors = c(
-	"#000000FF",
-	"#FF0000FF",
-	3,
-	"#0000FFFF",
-	"#00FFFFFF",
-	"#FF00FFFF",
-	"#FFFF00FF",
-	"#999999FF"
+	"#000000CC",
+	"#FF0000CC",
+	"#00CC00CC",
+	"#0000FFCC",
+	"#00FFFFCC",
+	"#FF00FFCC",
+	"#FFFF00CC",
+	"#999999CC"
 );
+#mycolors = c(
+#	"#ff0000", # Red
+#	"#0000ff", # Blue
+#	"#00cc00", # Green
+#	"#ff00ff", # Magenta
+#	"#00e0e0", # Cyan
+#	"#7f00ff", # Purple
+#	"#dddd00", # Yellow
+#	"#007ca8", # Slate-blue (similar)
+#	"#ff7000", # Orange
+#	"#b2a200"  # Darker yellow
+#);
+
+mycolors = colorspace::qualitative_hcl(5, palette="Dark 2");
+#mycolors = viridis(5);
+#mycolors = RColorBrewer::brewer.pal(5, "Set1");
+#mycolors = c(
+#	rgb(0.2980392156862745, 0.4470588235294118, 0.6901960784313725),
+#	rgb(0.8666666666666667, 0.5176470588235295, 0.3215686274509804),
+#	rgb(0.3333333333333333, 0.6588235294117647, 0.40784313725490196),
+#	rgb(0.7686274509803922, 0.3058823529411765, 0.3215686274509804),
+#	rgb(0.5058823529411764, 0.4470588235294118, 0.7019607843137254),
+#	rgb(0.5764705882352941, 0.47058823529411764, 0.3764705882352941),
+#	rgb(0.8549019607843137, 0.5450980392156862, 0.7647058823529411),
+#	rgb(0.5490196078431373, 0.5490196078431373, 0.5490196078431373),
+#	rgb(0.8, 0.7254901960784313, 0.4549019607843137),
+#	rgb(0.39215686274509803, 0.7098039215686275, 0.803921568627451)
+#)
+
+#Show colors
+dev.new(width=1*12, height=1*6)
+par(mfrow=c(1, 2));
+x = seq(0, 10, length=10000);
+plot(-1, -1, xlim=c(0, 10), ylim=c(-1, 1));
+for(i in seq_along(mycolors)){
+	lines(x, sin(x/2 - i/5), lwd=6, col=mycolors[i]);
+}
+x = seq_along(mycolors);
+plot(x, rep(1, length(x)), pch=16, cex=7, col=mycolors);
+
+#
 
 mylty = c(
 	"solid",
@@ -107,6 +148,8 @@ samples.hist = function(samples, breaks=20, main="", xmin=NULL){
 
 	# Plot the resulting pdf
 	histData = hist(samples, breaks=breaks, prob=T, col="peachpuff", xlab="Execution Time (s)", main=main, xlim=limits)
+	#rect(par("usr")[1], par("usr")[3], par("usr")[2], par("usr")[4], col = "#e3e3e3")
+	#histData = hist(samples, breaks=breaks, prob=T, col="peachpuff", xlab="Execution Time (s)", main=main, xlim=limits, add=T)
 }
 
 # Process all files and save all plots
