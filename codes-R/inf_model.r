@@ -7,7 +7,8 @@ InfModel = function(
 	lowerBounds,   # = c(1e-10, 1e-10)
 	upperBounds,   # = c(Inf, Inf)
 	initialParams, # = list(c(0.02, 0.5, 2, 5, 10), c(0.02, 0.5, 2, 5, 10))
-	param_pdf      # = function(samples, p, ...) dgamma(samples, shape=p[1], scale=p[2], ...)
+	param_pdf,     # = function(samples, p, ...) dgamma(samples, shape=p[1], scale=p[2], ...)
+	param_cdf      # = function(probs, p, ...) pgamma(samples, shape=p[1], scale=p[2], ...)
 ){
 	if(!is.character(name)) stop("name must be string.");
 	if(!is.character(paramNames)) stop("paramNames must be string.");
@@ -17,15 +18,19 @@ InfModel = function(
 	for(i in 1:length(initialParams))
 		if(!is.numeric(initialParams[[1]])) stop("InitialParams must be list of numerical vectors.");
 	if(!is.function(param_pdf)) stop("param_pdf must be function.");
+	if(!is.function(param_cdf)) stop("param_cdf must be function.");
 
 	structure(list(name=name, paramNames=paramNames, lowerBounds=lowerBounds,
 				   upperBounds=upperBounds, initialParams=initialParams,
-				   param_pdf=param_pdf),
+				   param_pdf=param_pdf, param_cdf=param_cdf),
 			  class="InfModel");
 };
 
 # Generic for inference
-infer = function(x, ...) UseMethod("infer")
+infer = function(x, ...) UseMethod("infer");
+
+# Generic for qqplot
+ppplot = function(x, ...) UseMethod("ppplot");
 
 infer.InfModel = function(model, samples, useC=FALSE){
 	estimatedC = min(samples) * 0.995;
@@ -128,5 +133,16 @@ lines.InfModel = function(model, samples, params, useC=FALSE, ...){
 	lines(x, y, ...);
 }
 
+ppplot.InfModel = function(model, samples, params, useC=FALSE, ...){
+	samples = sort(samples);
+	f = ecdf(samples);
+
+	x = model$param_cdf(samples, params);
+	y = f(samples);
+	
+	lines(x, y, ...);
+	abline(a=0, b=1);
+}
+
 # For debugging:
-model = InfModel("Gamma", c("shape", "scale"), c(1-10, 1-10), c(Inf, Inf), list(0.02, 0.02), function(p, ...) dgamma(shape=p[1], shape=p[2], ...))
+model = InfModel("Gamma", c("shape", "scale"), c(1-10, 1-10), c(Inf, Inf), list(0.02, 0.02), function(isamples, p, ...) dgamma(samples, shape=p[1], scale=p[2], ...), function(samples, p) pgamma(samples, shape=p[1], scale=p[2]));
