@@ -256,7 +256,19 @@ generate.plots = function(fullDataset, minEstimator=FALSE, useC=FALSE, iteratedC
 			print(df, width=150)
 			write.csv(df, file=paste(dataset$fileroot, "-", psize, ".csv", sep=""))
 
-			outputName = paste(dataset$fileroot, "-", psize, ".png", sep="")
+			outputName = paste(dataset$fileroot, "-", psize, sep="");
+			if(minEstimator != FALSE){
+				outputName = paste(outputName, "-", minEstimator, sep="");
+			}
+			if(useC != FALSE){
+				outputName = paste(outputName, "-inferC", sep="");
+			}
+			if(iteratedC != FALSE){
+				outputName = paste(outputName, "-iteratedC", sep="");
+			}
+			outputName = paste(outputName, "-", plotType, sep="");
+			outputName = paste(outputName, ".png", sep="");
+
 			savePlot(outputName, type="png")
 			graphics.off();
 		}
