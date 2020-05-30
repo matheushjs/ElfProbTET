@@ -120,7 +120,7 @@ allModels = function(samples){
 								 c(0.02, 0.5, 2, 5, 10)),
 			param_pdf = function(samples, p, log=FALSE, ...){
 				allLogs = rep(log(1e-300), length(samples));
-				retval = try(rmutil::dgweibull(samples, s=p[1], m=p[2], f=p[3], log=TRUE, ...));
+				retval = try(rmutil::dgweibull(samples[samples > 0], s=p[1], m=p[2], f=p[3], log=TRUE, ...));
 				if(is.numeric(retval))
 					allLogs[samples > 0] = retval;
 				if(log == FALSE)
@@ -129,9 +129,9 @@ allModels = function(samples){
 			},
 			param_cdf = function(samples, p, ...){
 				result = rep(0, length(samples));
-				probs = try(rmutil::pgweibull(samples, s=p[1], m=p[2], f=p[3], ...));
+				probs = try(rmutil::pgweibull(samples[samples > 0], s=p[1], m=p[2], f=p[3], ...));
 				if(is.numeric(probs))
-					result = probs;
+					result[samples > 0] = probs[samples > 0];
 				result;
 			},
 			param_q = function(q, p, ...){
