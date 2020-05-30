@@ -119,14 +119,12 @@ allModels = function(samples){
 					allLogs = exp(allLogs);
 				allLogs;
 			},
-			param_cdf = function(samples, p, log=FALSE, ...){
-				allLogs = rep(0, length(samples));
-				retval = try(rmutil::pgweibull(samples, s=p[1], m=p[2], f=p[3], log=TRUE, ...));
-				if(is.numeric(retval))
-					allLogs[samples > 0] = retval;
-				if(log == FALSE)
-					allLogs = exp(allLogs);
-				allLogs;
+			param_cdf = function(samples, p, ...){
+				result = rep(0, length(samples));
+				probs = try(rmutil::pgweibull(samples, s=p[1], m=p[2], f=p[3], ...));
+				if(is.numeric(probs))
+					result = probs;
+				result;
 			}
 		)
 	);

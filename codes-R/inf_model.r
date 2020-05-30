@@ -134,14 +134,34 @@ lines.InfModel = function(model, samples, params, useC=FALSE, ...){
 }
 
 ppplot.InfModel = function(model, samples, params, useC=FALSE, ...){
+	if(useC == TRUE){
+		samples = samples - params[length(params)];
+	}
+
 	samples = sort(samples);
-	f = ecdf(samples);
 
 	x = model$param_cdf(samples, params);
-	y = f(samples);
-	
-	lines(x, y, ...);
-	abline(a=0, b=1);
+	y = 1/length(samples) * seq(0, length(samples), length=length(samples)); # ECDF
+
+	ang = -pi/4;
+	rot = rbind(
+	  c(cos(ang), -sin(ang)),
+	  c(sin(ang), cos(ang))
+	);
+
+	data = cbind(x, y) %*% t(rot);
+
+	#x = x + 2*(x - y);
+
+	# Reduce number of points
+	#data = data[seq(ceiling(runif(n=1, max=15)), length(samples), by=25),]
+	fun = splinefun(data[,1], data[,2]);
+
+	x = seq(0, sqrt(2), length=sample(18:22)[1]);
+	y = fun(x);
+
+	points(x, y, ...);
+	abline(a=0, b=0);
 }
 
 # For debugging:

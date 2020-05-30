@@ -33,6 +33,10 @@ mycolors = c(
 	"#FFFF00CC",
 	"#999999CC"
 );
+
+mypch = c(19, 3, 17, 4, 15, 2);
+mycex = seq(1.5, 1, length=6);
+
 #mycolors = c(
 #	"#ff0000", # Red
 #	"#0000ff", # Blue
@@ -156,7 +160,8 @@ samples.hist = function(samples, breaks=20, main="", xmin=NULL){
 # If zeroPositioning is TRUE, we subtract the lowest execution time from the sample, making the empirical distribution begin at zero.
 # @param zeroPositioning can be FALSE if data should not be subtracted from some estimated populational minimum.
 #                        otherwise it can be "c1", "c2", "c3", "c4" depending on the estimator you want to use.
-generate.plots = function(fullDataset, zeroPositioning=FALSE, useC=FALSE, useMinEstimator=FALSE){
+# @param plotType can be "pdf" for histogram and pdf plotting, or "pp" for the PP-plot
+generate.plots = function(fullDataset, zeroPositioning=FALSE, useC=FALSE, useMinEstimator=FALSE, plotType="pdf"){
 	for(i in 1:length(fullDataset)){
 		dataset = fullDataset[[i]]
 
@@ -182,7 +187,17 @@ generate.plots = function(fullDataset, zeroPositioning=FALSE, useC=FALSE, useMin
 			graphics.off();
 			dev.new(width=1*12, height=1*6)
 			par(mfrow=c(1, 2));
-			samples.hist(samples, xmin=histMinX)
+
+			if(plotType == "pdf"){
+				samples.hist(samples, xmin=histMinX);
+			} else if(plotType == "pp"){
+				plot(-1, -1, xlim=c(0, sqrt(2)), ylim=c(-0.15, 0.15), xlab="", ylab="", axes=F);
+				axis(2);
+				box();
+				title(ylab="disparity", line=2);
+			} else {
+				stop("Invalid plotType");
+			}
 			plotCount = 1;
 
 			title = paste(capitalize(dataset$algorithm), capitalize(dataset$machine), psize, sep="-")
@@ -200,7 +215,13 @@ generate.plots = function(fullDataset, zeroPositioning=FALSE, useC=FALSE, useMin
 				errors = results["convergence"] != 0
 				errorRatio = sum(errors) / length(errors)
 				minus2l = -2*results["value"]
-				lines(model, samples, params, useC, lty=mylty[plotCount], col=mycolors[plotCount], lwd=getlwd(plotCount))
+
+				if(plotType == "pdf"){
+					lines(model, samples, params, useC, lty=mylty[plotCount], col=mycolors[plotCount], lwd=getlwd(plotCount))
+				} else if(plotType == "pp"){
+					ppplot(model, samples, params, useC, col=mycolors[plotCount], pch=mypch[plotCount], cex=mycex[plotCount], lwd=2);
+				}
+
 				df = rbind(df, c(title, model$name, paste.vector(params),
 								 -2*retval$cross,
 								 paste(minus2l), paste(minus2l + 2*nParams), paste(minus2l + 2*nParams*sampleSize/(sampleSize - nParams - 1)),
@@ -211,12 +232,26 @@ generate.plots = function(fullDataset, zeroPositioning=FALSE, useC=FALSE, useMin
 				colnames(df) = c("title", "model", "estimates", "crossValid", "-2l", "AIC", "CAIC", "BIC", "HQIC", "elapsed.time", "optErrorRatio")
 
 				if(plotCount == 6){
-					legend("topright", unname(unlist(df["model"]))[1:5], lty=mylty[1:5], col=mycolors[1:5], lwd=getlwd(1:5), seg.len=5);
-					samples.hist(samples, xmin=histMinX)
+					if(plotType == "pdf"){
+						legend("topright", unname(unlist(df["model"]))[1:5], lty=mylty[1:5], col=mycolors[1:5], lwd=getlwd(1:5), seg.len=5);
+						samples.hist(samples, xmin=histMinX)
+					} else if(plotType == "pp"){
+						legend("topleft", unname(unlist(df["model"]))[1:5], col=mycolors[1:5], pch=mypch[1:5], pt.lwd=2);
+						plot(-1, -1, xlim=c(0, sqrt(2)), ylim=c(-0.15, 0.15), xlab="", ylab="", axes=F);
+						axis(2);
+						box();
+						title(ylab="disparity", line=2);
+					}
+
 					plotCount = 1;
 				}
 			}
-			legend("topright", unname(unlist(df["model"]))[6:9], lty=mylty[1:4], col=mycolors[1:4], lwd=getlwd(1:4), seg.len=5);
+
+			if(plotType == "pdf"){
+				legend("topright", unname(unlist(df["model"]))[6:9], lty=mylty[1:4], col=mycolors[1:4], lwd=getlwd(1:4), seg.len=5);
+			} else if(plotType == "pp"){
+				legend("topleft", unname(unlist(df["model"]))[6:9], col=mycolors[1:4], pch=mypch[1:4], pt.lwd=2);
+			}
 
 			print(df, width=150)
 			write.csv(df, file=paste(dataset$fileroot, "-", psize, ".csv", sep=""))
