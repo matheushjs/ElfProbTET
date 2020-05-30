@@ -297,3 +297,17 @@ hints = function(){
 
 cat("INFO: I've lodaded the dataset in the variable 'fullDataset'", "\n")
 cat("`hints()` to get help", "\n")
+
+
+# All experiments
+
+#for(type in c("pdf", "pp")){
+#	generate.plots(fullDataset, plotType=type);
+#
+#	for(bool in c(TRUE, FALSE))
+#		generate.plots(fullDataset, useC=bool, plotType=type);
+#		generate.plots(fullDataset, iteratedC=bool, plotType=type);
+#
+#	for(estim in paste("c", 1:4))
+#		generate.plots(fullDataset, minEstimator=estim, plotType=type);
+#}
