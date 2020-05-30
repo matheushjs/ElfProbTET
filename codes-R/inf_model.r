@@ -8,7 +8,8 @@ InfModel = function(
 	upperBounds,   # = c(Inf, Inf)
 	initialParams, # = list(c(0.02, 0.5, 2, 5, 10), c(0.02, 0.5, 2, 5, 10))
 	param_pdf,     # = function(samples, p, ...) dgamma(samples, shape=p[1], scale=p[2], ...)
-	param_cdf      # = function(probs, p, ...) pgamma(samples, shape=p[1], scale=p[2], ...)
+	param_cdf,     # = function(probs, p, ...) pgamma(samples, shape=p[1], scale=p[2], ...)
+	param_q        # = function(q, params) qgamma(q, shape=params[1], scale=params[2])
 ){
 	if(!is.character(name)) stop("name must be string.");
 	if(!is.character(paramNames)) stop("paramNames must be string.");
@@ -19,10 +20,11 @@ InfModel = function(
 		if(!is.numeric(initialParams[[1]])) stop("InitialParams must be list of numerical vectors.");
 	if(!is.function(param_pdf)) stop("param_pdf must be function.");
 	if(!is.function(param_cdf)) stop("param_cdf must be function.");
+	if(!is.function(param_q)) stop("param_q must be function.");
 
 	structure(list(name=name, paramNames=paramNames, lowerBounds=lowerBounds,
 				   upperBounds=upperBounds, initialParams=initialParams,
-				   param_pdf=param_pdf, param_cdf=param_cdf),
+				   param_pdf=param_pdf, param_cdf=param_cdf, param_q=param_q),
 			  class="InfModel");
 };
 
@@ -32,7 +34,7 @@ infer = function(x, ...) UseMethod("infer");
 # Generic for qqplot
 ppplot = function(x, ...) UseMethod("ppplot");
 
-infer.InfModel = function(model, samples, useC=FALSE){
+infer.InfModel = function(model, samples, useC=FALSE, iteratedC=FALSE){
 	estimatedC = min(samples) * 0.995;
 
 	# The likelihood function
@@ -65,11 +67,18 @@ infer.InfModel = function(model, samples, useC=FALSE){
 	# Recursive function to iterate over the initial parameters
 	func = function(initialParams, curParams, curIdx){
 		if(curIdx > length(initialParams)){
-			if(useC == FALSE){
-				result = myoptim(curParams, function(p) likelihood(samples, p),
+			if(useC == TRUE){
+				result = myoptim(curParams, function(p) likelihood(samples, p, p[length(p)]),
+								 lower=model$lowerBounds, upper=model$upperBounds, method="L-BFGS-B");
+			} else if(iteratedC == TRUE){
+				result = myoptim(curParams,
+								 function(p){
+									 c = min(samples) - model$param_q(1 - (1 - 0.5)**(1/length(samples)), p);
+									 likelihood(samples, p, c)
+								 },
 								 lower=model$lowerBounds, upper=model$upperBounds, method="L-BFGS-B");
 			} else {
-				result = myoptim(curParams, function(p) likelihood(samples, p, p[length(p)]),
+				result = myoptim(curParams, function(p) likelihood(samples, p),
 								 lower=model$lowerBounds, upper=model$upperBounds, method="L-BFGS-B");
 			}
 			
@@ -108,7 +117,7 @@ infer.InfModel = function(model, samples, useC=FALSE){
 }
 
 # Lines is already a generic
-lines.InfModel = function(model, samples, params, useC=FALSE, ...){
+lines.InfModel = function(model, samples, params, useC=FALSE, iteratedC=FALSE, ...){
 	delta = diff(quantile(samples, c(0.05, 0.95)));
 	minVal = min(samples) - 0.95*delta;
 	maxVal = max(samples) + 1.05*delta;
@@ -120,6 +129,11 @@ lines.InfModel = function(model, samples, params, useC=FALSE, ...){
 		minVal = minVal - params[length(params)];
 		maxVal = maxVal - params[length(params)];
 	}
+	if(iteratedC){
+		c = min(samples) - model$param_q(1 - (1 - 0.5)**(1/length(samples)), params);
+		minVal = minVal - c;
+		maxVal = maxVal - c;
+	}
 
 	x = seq(minVal, maxVal, length=1000);
 	x[x <= 1e-10] = 1e-10;
@@ -129,13 +143,21 @@ lines.InfModel = function(model, samples, params, useC=FALSE, ...){
 
 	if(useC)
 		x = x + params[length(params)];
+	if(iteratedC){
+		c = min(samples) - model$param_q(1 - (1 - 0.5)**(1/length(samples)), params);
+		x = x + c;
+	}
 
 	lines(x, y, ...);
 }
 
-ppplot.InfModel = function(model, samples, params, useC=FALSE, ...){
+ppplot.InfModel = function(model, samples, params, useC=FALSE, iteratedC=FALSE, ...){
 	if(useC == TRUE){
 		samples = samples - params[length(params)];
+	}
+	if(iteratedC){
+		c = min(samples) - model$param_q(1 - (1 - 0.5)**(1/length(samples)), params);
+		samples = samples - c;
 	}
 
 	samples = sort(samples);
@@ -165,4 +187,4 @@ ppplot.InfModel = function(model, samples, params, useC=FALSE, ...){
 }
 
 # For debugging:
-model = InfModel("Gamma", c("shape", "scale"), c(1-10, 1-10), c(Inf, Inf), list(0.02, 0.02), function(isamples, p, ...) dgamma(samples, shape=p[1], scale=p[2], ...), function(samples, p) pgamma(samples, shape=p[1], scale=p[2]));
+model = InfModel("Gamma", c("shape", "scale"), c(1-10, 1-10), c(Inf, Inf), list(0.02, 0.02), function(isamples, p, ...) dgamma(samples, shape=p[1], scale=p[2], ...), function(samples, p) pgamma(samples, shape=p[1], scale=p[2]), function(q, p) qgamma(q, shape=p[1], scale=p[2]));

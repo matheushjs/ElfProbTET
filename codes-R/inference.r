@@ -161,7 +161,7 @@ samples.hist = function(samples, breaks=20, main="", xmin=NULL){
 # @param zeroPositioning can be FALSE if data should not be subtracted from some estimated populational minimum.
 #                        otherwise it can be "c1", "c2", "c3", "c4" depending on the estimator you want to use.
 # @param plotType can be "pdf" for histogram and pdf plotting, or "pp" for the PP-plot
-generate.plots = function(fullDataset, zeroPositioning=FALSE, useC=FALSE, useMinEstimator=FALSE, plotType="pdf"){
+generate.plots = function(fullDataset, zeroPositioning=FALSE, useC=FALSE, iteratedC=FALSE, plotType="pdf"){
 	for(i in 1:length(fullDataset)){
 		dataset = fullDataset[[i]]
 
@@ -207,7 +207,7 @@ generate.plots = function(fullDataset, zeroPositioning=FALSE, useC=FALSE, useMin
 			for(i in 1:length(models)){
 				model = models[[i]];
 
-				elapsed = system.time({ retval = infer(model, samples, useC) })["elapsed"]
+				elapsed = system.time({ retval = infer(model, samples, useC, iteratedC) })["elapsed"]
 				results = retval$results;
 				results = results[nrow(results),]
 				params = as.numeric(results[1:(length(results)-2)])
@@ -217,9 +217,9 @@ generate.plots = function(fullDataset, zeroPositioning=FALSE, useC=FALSE, useMin
 				minus2l = -2*results["value"]
 
 				if(plotType == "pdf"){
-					lines(model, samples, params, useC, lty=mylty[plotCount], col=mycolors[plotCount], lwd=getlwd(plotCount))
+					lines(model, samples, params, useC, iteratedC, lty=mylty[plotCount], col=mycolors[plotCount], lwd=getlwd(plotCount))
 				} else if(plotType == "pp"){
-					ppplot(model, samples, params, useC, col=mycolors[plotCount], pch=mypch[plotCount], cex=mycex[plotCount], lwd=2);
+					ppplot(model, samples, params, useC, iteratedC, col=mycolors[plotCount], pch=mypch[plotCount], cex=mycex[plotCount], lwd=2);
 				}
 
 				df = rbind(df, c(title, model$name, paste.vector(params),
