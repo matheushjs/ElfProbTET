@@ -46,7 +46,7 @@ mycolors = c(
 #	"#b2a200"  # Darker yellow
 #);
 
-mycolors = colorspace::qualitative_hcl(5, palette="Dark 2");
+#mycolors = colorspace::qualitative_hcl(5, palette="Dark 2");
 #mycolors = viridis(5);
 #mycolors = RColorBrewer::brewer.pal(5, "Set1");
 #mycolors = c(
