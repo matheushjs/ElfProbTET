@@ -275,9 +275,10 @@ hints = function(){
 	cat("
 	dataset = fullDataset[[1]]
 	samples.hist(dataset$samples[,1])
-	params = kwcwg.infer(dataset$samples[,1]);
-	params = as.matrix(params[nrow(params),])
-	kwcwg.lines(dataset$samples[,1], params)
+	models = allModels(dataset$samples[,1]);
+	params = infer(models[[1]], dataset$samples[,1]);
+	params = as.matrix(params$results[nrow(params$results),])
+	lines(models[[1]], dataset$samples[,1], params)
 	
 	generate.plots(fullDataset)", "\n")
 }
