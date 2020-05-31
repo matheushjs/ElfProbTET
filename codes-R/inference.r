@@ -176,7 +176,7 @@ generate.plots = function(fullDataset, minEstimator=FALSE, useC=FALSE, iteratedC
 				hatMin = switch(minEstimator,
 					c1 = min(samples) - abs(min(samples) * sd(samples) / mean(samples)) / log10(sampleSize),
 					c2 = min(samples) - sd(samples) / log10(sampleSize),
-					c3 = min(samples) - sd(samples) * sqrt(log(log(n)) / (2*sampleSize)),
+					c3 = min(samples) - sd(samples) * sqrt(log(log(sampleSize)) / (2*sampleSize)),
 					c4 = min(samples) - sd(samples) * sqrt(-log(0.05/2) / (2*sampleSize))
 					)
 				histMinX = 0
@@ -301,13 +301,11 @@ cat("`hints()` to get help", "\n")
 
 # All experiments
 
-#for(type in c("pdf", "pp")){
-#	generate.plots(fullDataset, plotType=type);
-#
-#	for(bool in c(TRUE, FALSE))
-#		generate.plots(fullDataset, useC=bool, plotType=type);
-#		generate.plots(fullDataset, iteratedC=bool, plotType=type);
-#
-#	for(estim in paste("c", 1:4))
-#		generate.plots(fullDataset, minEstimator=estim, plotType=type);
-#}
+for(type in c("pdf", "pp")){
+	generate.plots(fullDataset, plotType=type);
+	generate.plots(fullDataset, useC=TRUE, plotType=type);
+	generate.plots(fullDataset, iteratedC=TRUE, plotType=type);
+
+	for(estim in paste("c", 1:4))
+		generate.plots(fullDataset, minEstimator=estim, plotType=type);
+}
