@@ -302,10 +302,10 @@ cat("`hints()` to get help", "\n")
 # All experiments
 
 for(type in c("pdf", "pp")){
-	generate.plots(fullDataset, plotType=type);
-	generate.plots(fullDataset, useC=TRUE, plotType=type);
-	generate.plots(fullDataset, iteratedC=TRUE, plotType=type);
+	#generate.plots(fullDataset, plotType=type);
+	#generate.plots(fullDataset, useC=TRUE, plotType=type);
+	#generate.plots(fullDataset, iteratedC=TRUE, plotType=type);
 
-	for(estim in paste("c", 1:4))
+	for(estim in paste("c", 1:4, sep=""))
 		generate.plots(fullDataset, minEstimator=estim, plotType=type);
 }
