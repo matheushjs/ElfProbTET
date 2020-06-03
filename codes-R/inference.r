@@ -1,5 +1,3 @@
-require(viridis)
-
 source("./allModels.r");
 
 # Returns the sample sets in each file
