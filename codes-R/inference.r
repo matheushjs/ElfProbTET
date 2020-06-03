@@ -253,9 +253,6 @@ generate.plots = function(fullDataset, minEstimator=FALSE, useC=FALSE, iteratedC
 				legend("topleft", unname(unlist(df["model"]))[6:9], col=mycolors[1:4], pch=mypch[1:4], pt.lwd=2);
 			}
 
-			print(df, width=150)
-			write.csv(df, file=paste(dataset$fileroot, "-", psize, ".csv", sep=""))
-
 			outputName = paste(dataset$fileroot, "-", psize, sep="");
 			if(minEstimator != FALSE){
 				outputName = paste(outputName, "-", minEstimator, sep="");
@@ -267,9 +264,11 @@ generate.plots = function(fullDataset, minEstimator=FALSE, useC=FALSE, iteratedC
 				outputName = paste(outputName, "-iteratedC", sep="");
 			}
 			outputName = paste(outputName, "-", plotType, sep="");
-			outputName = paste(outputName, ".png", sep="");
 
-			savePlot(outputName, type="png")
+
+			print(df, width=150)
+			write.csv(df, file=paste(outputName, ".csv", sep=""))
+			savePlot(paste(outputName, ".png", sep=""), type="png")
 			graphics.off();
 		}
 	}
