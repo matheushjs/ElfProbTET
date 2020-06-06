@@ -1,3 +1,10 @@
+
+paths = .libPaths();
+.libPaths(c(paths, "R/x86_64-pc-linux-gnu-library/3.5/"));
+
+require(stringr);
+require(R.utils);
+
 source("./allModels.r");
 
 # Returns the sample sets in each file
