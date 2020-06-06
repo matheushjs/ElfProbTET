@@ -320,3 +320,17 @@ for(type in c("pdf", "pp")){
 	for(estim in paste("c", 1:4, sep=""))
 		generate.plots(fullDataset, minEstimator=estim, plotType=type);
 }
+
+#dev.new(width=12, height=2.5*12);
+#par(mfrow=c(10, 4));
+#for(i in 1:length(fullDataset)){
+#	dataset = fullDataset[[i]];
+#	for(j in 1:max(4, ncol(dataset$samples))){
+#		if(j > ncol(dataset$samples)){
+#			plot.new();
+#			break;
+#	}
+#		samples.hist(dataset$samples[,j], main=dataset$filename);
+#	}
+#}
+#savePlot("allHistograms.png")
