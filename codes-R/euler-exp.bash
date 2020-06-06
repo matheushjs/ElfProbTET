@@ -10,4 +10,5 @@ TIMEFORMAT="%E";
 module load gcc/4.9.2;
 module load R/3.5.0;
 
+cd /home/mathjs/ElfProbTET/codes-R;
 R -f inference.r;
