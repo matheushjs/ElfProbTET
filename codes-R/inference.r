@@ -181,6 +181,14 @@ generate.plots = function(fullDataset, minEstimator=FALSE, useC=FALSE, iteratedC
 				samples = samples - hatMin;
 				cat("hatMin: ", hatMin, "\n")
 			}
+			if(useC || iteratedC){
+				c2 = min(samples) - sd(samples) / log10(sampleSize);
+				models = allModels(samples - c2);
+			} else {
+				models = allModels(samples);
+			}
+
+
 
 			graphics.off();
 			dev.new(width=1*12, height=1*6)
@@ -201,7 +209,6 @@ generate.plots = function(fullDataset, minEstimator=FALSE, useC=FALSE, iteratedC
 			title = paste(capitalize(dataset$algorithm), capitalize(dataset$machine), psize, sep="-")
 			title(title, line = -3, outer = TRUE)
 
-			models = allModels(samples);
 			for(i in 1:length(models)){
 				model = models[[i]];
 
@@ -299,9 +306,9 @@ cat("`hints()` to get help", "\n")
 # All experiments
 
 for(type in c("pdf", "pp")){
-	#generate.plots(fullDataset, plotType=type);
-	#generate.plots(fullDataset, useC=TRUE, plotType=type);
-	#generate.plots(fullDataset, iteratedC=TRUE, plotType=type);
+	generate.plots(fullDataset, plotType=type);
+	generate.plots(fullDataset, useC=TRUE, plotType=type);
+	generate.plots(fullDataset, iteratedC=TRUE, plotType=type);
 
 	for(estim in paste("c", 1:4, sep=""))
 		generate.plots(fullDataset, minEstimator=estim, plotType=type);

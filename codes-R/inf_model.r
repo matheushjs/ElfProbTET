@@ -136,7 +136,8 @@ lines.InfModel = function(model, samples, params, useC=FALSE, iteratedC=FALSE, .
 	}
 
 	x = seq(minVal, maxVal, length=1000);
-	x[x <= 1e-10] = 1e-10;
+	if(model$name != "Normal")
+		x[x <= 1e-10] = 1e-10;
 	y = model$param_pdf(x, params);
 	if(!is.numeric(y))
 		y = rep(0, length(x));
