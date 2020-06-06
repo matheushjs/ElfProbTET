@@ -223,6 +223,8 @@ generate.plots = function(fullDataset, minEstimator=FALSE, useC=FALSE, iteratedC
 				results = retval$results;
 				results = results[nrow(results),]
 				params = as.numeric(results[1:(length(results)-2)])
+
+				# TODO: There is an error here in parameter counting, but it affects all models the same way, so it is ok for now.
 				nParams = length(params)
 				errors = results["convergence"] != 0
 				errorRatio = sum(errors) / length(errors)
