@@ -3,6 +3,16 @@ Probabilistic Treatment of Execution Times
 
 This is the main repository of my computer science course conclusion project 1.
 
+## Directory Structure
+
+- `codes-R/` - Code used to perform statistical inference (in R) and analysis (in Python).
+- `dijkstra/` - Code used to collect execution times of the Dijkstra algorithm.
+- `experiments/`- The execution times collected. Each file contains multiple (3 or 4) sets of 1000 execution times.
+- `mandelbrot/` -  Code for collecting execution times of the Mandelbrot algorithm.
+- `min-estimators/` - [unused now] I did initial experiments on min-estimators here.
+- `optimization-packages/` - I tested some R optimization packages here.
+- `sqldb\_manipulation/` - Code for collecting execution times of the database manipulation algorithm.
+
 <div class="container text-justify">
   <h1>Objectives</h1>
   <p>
