@@ -129,11 +129,13 @@ infer.InfModel = function(model, samples, useC=FALSE, iteratedC=FALSE){
 							  lower=model$lowerBounds, upper=model$upperBounds, method="L-BFGS-B");
 
 	slice = retval[c("value", "elapsed.inf")];
-	slice = slice[which(slice$value / bestResult$value > 0.3),];
-	#print(slice);
-	#plot(retval$value, retval$elapsed.inf, xlim=c(quantile(retval$value, 0.5), max(retval$value)));
-	#locator(1);
+	slice = slice[which(slice$value / bestResult$value > 0.3),]; # Selects the set of best parameters (or useful parameters)
 
+	# results["value"]: maximized likelihood
+	# results["convergence"]: convergence status obtained in each inference
+	# results["elapsed.inf"]: time taken to perform each inference
+	# inf.time: summary of time taken for the set of all useful parameters we found (those that
+	#           yielded a minimally reasonable value of likelihood).
 	return(list(
 		results  = retval,
 		cross    = cross,
