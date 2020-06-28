@@ -221,14 +221,16 @@ generate.plots = function(fullDataset, minEstimator=FALSE, useC=FALSE, iteratedC
 
 				elapsed = system.time({ retval = infer(model, samples, useC, iteratedC) })["elapsed"]
 				results = retval$results;
+				infTime = retval$inf.time;
 				results = results[nrow(results),]
-				params = as.numeric(results[1:(length(results)-2)])
+				params = as.numeric(results[1:(length(results)-3)])
 
 				# TODO: There is an error here in parameter counting, but it affects all models the same way, so it is ok for now.
 				nParams = length(params)
 				errors = results["convergence"] != 0
 				errorRatio = sum(errors) / length(errors)
 				minus2l = -2*results["value"]
+				totalInfTime = results["elapsed.inf"]
 
 				if(plotType == "pdf"){
 					lines(model, samples, params, useC, iteratedC, lty=mylty[plotCount], col=mycolors[plotCount], lwd=getlwd(plotCount))
@@ -239,11 +241,16 @@ generate.plots = function(fullDataset, minEstimator=FALSE, useC=FALSE, iteratedC
 				df = rbind(df, c(title, model$name, paste.vector(params),
 								 -2*retval$cross,
 								 paste(minus2l), paste(minus2l + 2*nParams), paste(minus2l + 2*nParams*sampleSize/(sampleSize - nParams - 1)),
-								 paste(minus2l + 2*nParams*log(log(sampleSize))), paste(minus2l + nParams*log(sampleSize)), paste(elapsed), paste(errorRatio)),
+								 paste(minus2l + 2*nParams*log(log(sampleSize))), paste(minus2l + nParams*log(sampleSize)),
+								 paste(elapsed),
+								 paste(errorRatio),
+								 paste(totalInfTime),
+								 paste(infTime$mean), paste(infTime$sd), paste(infTime$n)
+							),
 						   stringsAsFactors=FALSE)
 				plotCount = plotCount + 1;
 
-				colnames(df) = c("title", "model", "estimates", "crossValid", "-2l", "AIC", "CAIC", "BIC", "HQIC", "elapsed.time", "optErrorRatio")
+				colnames(df) = c("title", "model", "estimates", "crossValid", "-2l", "AIC", "CAIC", "BIC", "HQIC", "elapsed.time", "optErrorRatio", "totalInfTime", "infTime.mean", "infTime.sd", "infTime.n");
 
 				if(plotCount == 6){
 					if(plotType == "pdf"){

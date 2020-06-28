@@ -64,22 +64,31 @@ infer.InfModel = function(model, samples, useC=FALSE, iteratedC=FALSE){
 		model$initialParams[[length(model$initialParams) + 1]] = c(estimatedC);
 	}
 
+	bestInitParams = NULL;
+	bestLikelihood = -Inf;
+
 	# Recursive function to iterate over the initial parameters
 	func = function(initialParams, curParams, curIdx){
 		if(curIdx > length(initialParams)){
 			if(useC == TRUE){
-				result = myoptim(curParams, function(p) likelihood(samples, p, p[length(p)]),
-								 lower=model$lowerBounds, upper=model$upperBounds, method="L-BFGS-B");
+				elapsed = system.time({
+					result = myoptim(curParams, function(p) likelihood(samples, p, p[length(p)]),
+									 lower=model$lowerBounds, upper=model$upperBounds, method="L-BFGS-B");
+				})["elapsed"]
 			} else if(iteratedC == TRUE){
-				result = myoptim(curParams,
-								 function(p){
-									 c = min(samples) - model$param_q(1 - (1 - 0.5)**(1/length(samples)), p);
-									 likelihood(samples, p, c)
-								 },
-								 lower=model$lowerBounds, upper=model$upperBounds, method="L-BFGS-B");
+				elapsed = system.time({
+					result = myoptim(curParams,
+									 function(p){
+										 c = min(samples) - model$param_q(1 - (1 - 0.5)**(1/length(samples)), p);
+										 likelihood(samples, p, c)
+									 },
+									 lower=model$lowerBounds, upper=model$upperBounds, method="L-BFGS-B");
+				})["elapsed"]
 			} else {
-				result = myoptim(curParams, function(p) likelihood(samples, p),
-								 lower=model$lowerBounds, upper=model$upperBounds, method="L-BFGS-B");
+				elapsed = system.time({
+					result = myoptim(curParams, function(p) likelihood(samples, p),
+									 lower=model$lowerBounds, upper=model$upperBounds, method="L-BFGS-B");
+				})["elapsed"]
 			}
 			
 			params = result$par;
@@ -87,8 +96,14 @@ infer.InfModel = function(model, samples, useC=FALSE, iteratedC=FALSE){
 			convergence = result$convergence;
 			# cat("Got params:", params, "\n")
 
+			if(val > bestLikelihood){
+				# access to parent scope
+				bestInitParams <<- curParams;
+				bestLikelihood <<- val;
+			}
+
 			# Access to parent scope
-			retval <<- rbind(retval, c(params, val, convergence));
+			retval <<- rbind(retval, c(params, val, convergence, elapsed));
 		} else {
 			initParams = initialParams[[curIdx]];
 			if(is.function(initParams))
@@ -101,7 +116,7 @@ infer.InfModel = function(model, samples, useC=FALSE, iteratedC=FALSE){
 	func(model$initialParams, NULL, 1);
 
 	retval = as.data.frame(retval);
-	colnames(retval) = c(model$paramNames, "value", "convergence")
+	colnames(retval) = c(model$paramNames, "value", "convergence", "elapsed.inf")
 
 	# We sort it by value
 	sortedIdx = sort.list(retval$value, decreasing=FALSE);
@@ -113,7 +128,20 @@ infer.InfModel = function(model, samples, useC=FALSE, iteratedC=FALSE){
 	cross  = cross.validation(params, samples, likelihood, useC=useC,
 							  lower=model$lowerBounds, upper=model$upperBounds, method="L-BFGS-B");
 
-	return(list(results=retval, cross=cross));
+	slice = retval[c("value", "elapsed.inf")];
+	slice = slice[which(slice$value / bestResult$value > 0.3),];
+	#print(slice);
+	#plot(retval$value, retval$elapsed.inf, xlim=c(quantile(retval$value, 0.5), max(retval$value)));
+	#locator(1);
+
+	return(list(
+		results  = retval,
+		cross    = cross,
+		inf.time = list(
+				mean = mean(slice$elapsed.inf),
+				sd   = sd(slice$elapsed.inf),
+				n    = nrow(slice)
+		)));
 }
 
 # Lines is already a generic
