@@ -381,7 +381,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 146,
+   "execution_count": 173,
    "metadata": {},
    "outputs": [],
    "source": [
@@ -391,7 +391,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 198,
+   "execution_count": 174,
    "metadata": {},
    "outputs": [
     {
@@ -400,11 +400,11 @@
        "Index(['title', 'model', 'estimates', 'crossValid', '-2l', 'AIC', 'CAIC',\n",
        "       'BIC', 'HQIC', 'elapsed.time', 'optErrorRatio', 'totalInfTime',\n",
        "       'infTime.mean', 'infTime.sd', 'infTime.n', 'algorithm', 'machine',\n",
-       "       'psize', 'infMethod', 'experiment', 'timePerInf'],\n",
+       "       'psize', 'infMethod', 'experiment'],\n",
        "      dtype='object')"
       ]
      },
-     "execution_count": 198,
+     "execution_count": 174,
      "metadata": {},
      "output_type": "execute_result"
     }
@@ -420,14 +420,13 @@
     "## A little explanation is due here\n",
     "\n",
     "- elapsed.time: Total time to perform all inferences\n",
-    "- timePerInf: same as elapsed.time but averaged over the number of initial parameters tried.\n",
     "- infTime.mean: mean of the inference procedures that achieved the best values\n",
     "- totalInfTime: I think it is the time elapsed for inferring the parameters we chose as best."
    ]
   },
   {
    "cell_type": "code",
-   "execution_count": 236,
+   "execution_count": 176,
    "metadata": {},
    "outputs": [
     {
@@ -452,7 +451,6 @@
        "    <tr style=\"text-align: right;\">\n",
        "      <th></th>\n",
        "      <th>elapsed.time</th>\n",
-       "      <th>timePerInf</th>\n",
        "      <th>infTime.mean</th>\n",
        "      <th>infTime.sd</th>\n",
        "      <th>totalInfTime</th>\n",
@@ -462,7 +460,6 @@
        "    <tr>\n",
        "      <th>5</th>\n",
        "      <td>42.055</td>\n",
-       "      <td>1.168194</td>\n",
        "      <td>1.041500</td>\n",
        "      <td>0.379368</td>\n",
        "      <td>1.206</td>\n",
@@ -470,7 +467,6 @@
        "    <tr>\n",
        "      <th>5</th>\n",
        "      <td>39.751</td>\n",
-       "      <td>1.104194</td>\n",
        "      <td>0.964611</td>\n",
        "      <td>0.345413</td>\n",
        "      <td>1.217</td>\n",
@@ -478,7 +474,6 @@
        "    <tr>\n",
        "      <th>5</th>\n",
        "      <td>54.000</td>\n",
-       "      <td>1.500000</td>\n",
        "      <td>1.361778</td>\n",
        "      <td>0.513871</td>\n",
        "      <td>2.157</td>\n",
@@ -486,7 +481,6 @@
        "    <tr>\n",
        "      <th>5</th>\n",
        "      <td>31.641</td>\n",
-       "      <td>0.878917</td>\n",
        "      <td>0.769250</td>\n",
        "      <td>0.265807</td>\n",
        "      <td>1.000</td>\n",
@@ -494,7 +488,6 @@
        "    <tr>\n",
        "      <th>5</th>\n",
        "      <td>47.188</td>\n",
-       "      <td>1.310778</td>\n",
        "      <td>1.148111</td>\n",
        "      <td>0.337078</td>\n",
        "      <td>1.334</td>\n",
@@ -505,12 +498,10 @@
        "      <td>...</td>\n",
        "      <td>...</td>\n",
        "      <td>...</td>\n",
-       "      <td>...</td>\n",
        "    </tr>\n",
        "    <tr>\n",
        "      <th>5</th>\n",
        "      <td>71.712</td>\n",
-       "      <td>1.992000</td>\n",
        "      <td>1.774972</td>\n",
        "      <td>0.454061</td>\n",
        "      <td>2.050</td>\n",
@@ -518,7 +509,6 @@
        "    <tr>\n",
        "      <th>5</th>\n",
        "      <td>64.452</td>\n",
-       "      <td>1.790333</td>\n",
        "      <td>1.535583</td>\n",
        "      <td>0.777650</td>\n",
        "      <td>0.985</td>\n",
@@ -526,7 +516,6 @@
        "    <tr>\n",
        "      <th>5</th>\n",
        "      <td>48.738</td>\n",
-       "      <td>1.353833</td>\n",
        "      <td>1.189222</td>\n",
        "      <td>0.356257</td>\n",
        "      <td>0.643</td>\n",
@@ -534,7 +523,6 @@
        "    <tr>\n",
        "      <th>5</th>\n",
        "      <td>73.455</td>\n",
-       "      <td>2.040417</td>\n",
        "      <td>1.905083</td>\n",
        "      <td>0.502113</td>\n",
        "      <td>1.664</td>\n",
@@ -542,46 +530,45 @@
        "    <tr>\n",
        "      <th>5</th>\n",
        "      <td>50.956</td>\n",
-       "      <td>1.415444</td>\n",
        "      <td>1.287194</td>\n",
        "      <td>0.474106</td>\n",
        "      <td>0.933</td>\n",
        "    </tr>\n",
        "  </tbody>\n",
        "</table>\n",
-       "<p>259 rows × 5 columns</p>\n",
+       "<p>259 rows × 4 columns</p>\n",
        "</div>"
       ],
       "text/plain": [
-       "    elapsed.time  timePerInf  infTime.mean  infTime.sd  totalInfTime\n",
-       "5         42.055    1.168194      1.041500    0.379368         1.206\n",
-       "5         39.751    1.104194      0.964611    0.345413         1.217\n",
-       "5         54.000    1.500000      1.361778    0.513871         2.157\n",
-       "5         31.641    0.878917      0.769250    0.265807         1.000\n",
-       "5         47.188    1.310778      1.148111    0.337078         1.334\n",
-       "..           ...         ...           ...         ...           ...\n",
-       "5         71.712    1.992000      1.774972    0.454061         2.050\n",
-       "5         64.452    1.790333      1.535583    0.777650         0.985\n",
-       "5         48.738    1.353833      1.189222    0.356257         0.643\n",
-       "5         73.455    2.040417      1.905083    0.502113         1.664\n",
-       "5         50.956    1.415444      1.287194    0.474106         0.933\n",
+       "    elapsed.time  infTime.mean  infTime.sd  totalInfTime\n",
+       "5         42.055      1.041500    0.379368         1.206\n",
+       "5         39.751      0.964611    0.345413         1.217\n",
+       "5         54.000      1.361778    0.513871         2.157\n",
+       "5         31.641      0.769250    0.265807         1.000\n",
+       "5         47.188      1.148111    0.337078         1.334\n",
+       "..           ...           ...         ...           ...\n",
+       "5         71.712      1.774972    0.454061         2.050\n",
+       "5         64.452      1.535583    0.777650         0.985\n",
+       "5         48.738      1.189222    0.356257         0.643\n",
+       "5         73.455      1.905083    0.502113         1.664\n",
+       "5         50.956      1.287194    0.474106         0.933\n",
        "\n",
-       "[259 rows x 5 columns]"
+       "[259 rows x 4 columns]"
       ]
      },
-     "execution_count": 236,
+     "execution_count": 176,
      "metadata": {},
      "output_type": "execute_result"
     }
    ],
    "source": [
     "temp = df[df[\"model\"] == \"OLL-GG\"]\n",
-    "temp[[\"elapsed.time\", \"timePerInf\", \"infTime.mean\", \"infTime.sd\", \"totalInfTime\"]]"
+    "temp[[\"elapsed.time\", \"infTime.mean\", \"infTime.sd\", \"totalInfTime\"]]"
    ]
   },
   {
    "cell_type": "code",
-   "execution_count": 147,
+   "execution_count": 177,
    "metadata": {
     "scrolled": true
    },
@@ -713,7 +700,7 @@
        "[11655 rows x 4 columns]"
       ]
      },
-     "execution_count": 147,
+     "execution_count": 177,
      "metadata": {},
      "output_type": "execute_result"
     }
@@ -747,7 +734,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 148,
+   "execution_count": 10,
    "metadata": {
     "scrolled": false
    },
