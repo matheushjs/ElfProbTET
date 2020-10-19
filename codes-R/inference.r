@@ -321,14 +321,14 @@ cat("`hints()` to get help", "\n")
 
 # All experiments
 
-for(type in c("pdf", "pp")){
-	generate.plots(fullDataset, plotType=type);
-	generate.plots(fullDataset, useC=TRUE, plotType=type);
-	generate.plots(fullDataset, iteratedC=TRUE, plotType=type);
-
-	for(estim in paste("c", 1:4, sep=""))
-		generate.plots(fullDataset, minEstimator=estim, plotType=type);
-}
+#for(type in c("pdf", "pp")){
+#	generate.plots(fullDataset, plotType=type);
+#	generate.plots(fullDataset, useC=TRUE, plotType=type);
+#	generate.plots(fullDataset, iteratedC=TRUE, plotType=type);
+#
+#	for(estim in paste("c", 1:4, sep=""))
+#		generate.plots(fullDataset, minEstimator=estim, plotType=type);
+#}
 
 #dev.new(width=12, height=2.5*12);
 #par(mfrow=c(10, 4));
@@ -342,4 +342,4 @@ for(type in c("pdf", "pp")){
 #		samples.hist(dataset$samples[,j], main=dataset$filename);
 #	}
 #}
-#savePlot("allHistograms.png")
+##savePlot("allHistograms.png")
