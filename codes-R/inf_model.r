@@ -59,9 +59,9 @@ infer.InfModel = function(model, samples, useC=FALSE, iteratedC=FALSE){
 
 	if(useC){
 		model$paramNames = c(model$paramNames, "c");
-		model$lowerBounds = c(model$lowerBounds, 1e-10);
+		model$lowerBounds = c(model$lowerBounds, 0);
 		model$upperBounds = c(model$upperBounds, min(samples) - 1e-10);
-		model$initialParams[[length(model$initialParams) + 1]] = c(estimatedC);
+		model$initialParams[[length(model$initialParams) + 1]] = 0;
 	}
 
 	bestInitParams = NULL;
@@ -131,6 +131,8 @@ infer.InfModel = function(model, samples, useC=FALSE, iteratedC=FALSE){
 	slice = retval[c("value", "elapsed.inf")];
 	slice = slice[which(slice$value / bestResult$value > 0.3),]; # Selects the set of best parameters (or useful parameters)
 
+	allValues = retval[,"value"];
+
 	# results["value"]: maximized likelihood
 	# results["convergence"]: convergence status obtained in each inference
 	# results["elapsed.inf"]: time taken to perform each inference
@@ -143,7 +145,10 @@ infer.InfModel = function(model, samples, useC=FALSE, iteratedC=FALSE){
 				mean = mean(slice$elapsed.inf),
 				sd   = sd(slice$elapsed.inf),
 				n    = nrow(slice)
-		)));
+			),
+		lik.mean = mean(-2*allValues),
+		lik.sd   = sd(-2*allValues)
+		));
 }
 
 # Lines is already a generic

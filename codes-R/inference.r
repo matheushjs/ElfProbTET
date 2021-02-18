@@ -245,12 +245,16 @@ generate.plots = function(fullDataset, minEstimator=FALSE, useC=FALSE, iteratedC
 								 paste(elapsed),
 								 paste(errorRatio),
 								 paste(totalInfTime),
-								 paste(infTime$mean), paste(infTime$sd), paste(infTime$n)
+								 paste(infTime$mean), paste(infTime$sd), paste(infTime$n),
+								 retval$lik.mean, retval$lik.sd
 							),
 						   stringsAsFactors=FALSE)
 				plotCount = plotCount + 1;
 
-				colnames(df) = c("title", "model", "estimates", "crossValid", "-2l", "AIC", "CAIC", "BIC", "HQIC", "elapsed.time", "optErrorRatio", "totalInfTime", "infTime.mean", "infTime.sd", "infTime.n");
+				colnames(df) = c("title", "model", "estimates", "crossValid", "-2l", "AIC", "CAIC", "BIC", "HQIC",
+								 "elapsed.time", "optErrorRatio",
+								 "totalInfTime", "infTime.mean", "infTime.sd", "infTime.n",
+								 "lik.mean", "lik.sd");
 
 				if(plotCount == 6){
 					if(plotType == "pdf"){
@@ -321,14 +325,15 @@ cat("`hints()` to get help", "\n")
 
 # All experiments
 
-#for(type in c("pdf", "pp")){
-#	generate.plots(fullDataset, plotType=type);
-#	generate.plots(fullDataset, useC=TRUE, plotType=type);
-#	generate.plots(fullDataset, iteratedC=TRUE, plotType=type);
-#
-#	for(estim in paste("c", 1:4, sep=""))
-#		generate.plots(fullDataset, minEstimator=estim, plotType=type);
-#}
+for(type in c("pdf")){
+	generate.plots(fullDataset, plotType=type);
+	generate.plots(fullDataset, useC=TRUE, plotType=type);
+	#generate.plots(fullDataset, iteratedC=TRUE, plotType=type);
+	generate.plots(fullDataset, minEstimator="c3", plotType=type);
+
+	#for(estim in paste("c", 1:4, sep=""))
+	#	generate.plots(fullDataset, minEstimator=estim, plotType=type);
+}
 
 #dev.new(width=12, height=2.5*12);
 #par(mfrow=c(10, 4));
